@@ -17,6 +17,16 @@ export interface DebugLogEntry {
       name?: string;
       email?: string;
     };
+    accessToken?: {
+      raw: string;
+      decoded: any;
+      issuedAt: string;
+      expiresAt: string;
+      subject?: string;
+      issuer?: string;
+      audience?: string | string[];
+      scopes?: string;
+    } | string;
     [key: string]: any;
   };
 }
@@ -31,23 +41,62 @@ interface DebugContextType {
 const DebugContext = createContext<DebugContextType | undefined>(undefined);
 
 export function DebugProvider({ children }: { children: ReactNode }) {
-  const [logs, setLogs] = useState<DebugLogEntry[]>([]);
+  const [logs, setLogs] = useState<DebugLogEntry[]>(() => {
+    // Load logs from localStorage on mount
+    if (typeof window !== 'undefined') {
+      try {
+        const savedLogs = localStorage.getItem('debugLogs');
+        if (savedLogs) {
+          const parsed = JSON.parse(savedLogs);
+          // Convert timestamp strings back to Date objects
+          return parsed.map((log: any) => ({
+            ...log,
+            timestamp: new Date(log.timestamp),
+          }));
+        }
+      } catch (error) {
+        console.error('[DebugContext] Error loading logs:', error);
+      }
+    }
+    return [];
+  });
 
   const addLog = (entry: Omit<DebugLogEntry, 'id' | 'timestamp'>) => {
+    console.log('[DebugContext] addLog called with:', entry);
+    
     const newLog: DebugLogEntry = {
       ...entry,
       id: `${Date.now()}-${Math.random()}`,
       timestamp: new Date(),
     };
 
-    setLogs((prev) => [newLog, ...prev]); // Add to beginning for latest first
+    console.log('[DebugContext] New log created:', newLog);
+
+    setLogs((prev) => {
+      const updated = [newLog, ...prev]; // Add to beginning for latest first
+      
+      // Persist to localStorage
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('debugLogs', JSON.stringify(updated.slice(0, 50))); // Keep last 50
+        } catch (error) {
+          console.error('[DebugContext] Error saving logs:', error);
+        }
+      }
+      
+      return updated;
+    });
     
     // Also log to console for development
-    console.log('[Debug Log]', newLog);
+    console.log('[Debug Log Added]', newLog);
   };
 
   const clearLogs = () => {
+    console.log('[DebugContext] Clearing all logs');
     setLogs([]);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('debugLogs');
+    }
   };
 
   const latestLog = logs.length > 0 ? logs[0] : null;

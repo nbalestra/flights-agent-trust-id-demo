@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plane, Loader2 } from 'lucide-react';
 import { useDebug } from '@/contexts/DebugContext';
+import { decodeJWT, formatJWTPayload } from '@/lib/jwt-utils';
+import { DebugPane } from '@/components/DebugPane';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -13,30 +15,83 @@ export default function Home() {
 
   useEffect(() => {
     if (session) {
+      console.log('[Login] Session received:', {
+        hasAccessToken: !!session.accessToken,
+        accessTokenLength: session.accessToken?.length,
+        sessionKeys: Object.keys(session),
+      });
+
+      // Decode access token if available
+      let tokenPayload = null;
+      let formattedToken = null;
+      
+      if (session.accessToken) {
+        console.log('[Login] Decoding access token...');
+        tokenPayload = decodeJWT(session.accessToken);
+        console.log('[Login] Token payload:', tokenPayload);
+        
+        if (tokenPayload) {
+          formattedToken = formatJWTPayload(tokenPayload);
+          console.log('[Login] Formatted token:', formattedToken);
+        }
+      } else {
+        console.warn('[Login] No access token in session!');
+        console.log('[Login] Full session object:', session);
+      }
+
+      const logDetails: any = {
+        user: {
+          name: session.user?.name || undefined,
+          email: session.user?.email || undefined,
+        },
+        provider: 'Keycloak',
+        sessionInfo: {
+          hasAccessToken: !!session.accessToken,
+          hasIdToken: !!(session as any).idToken,
+          hasRefreshToken: !!(session as any).refreshToken,
+        },
+        rawSession: JSON.stringify(session, null, 2),
+      };
+
+      // Add access token info if available
+      if (session.accessToken) {
+        logDetails.accessToken = {
+          raw: session.accessToken,
+          decoded: formattedToken,
+          issuedAt: formattedToken?.iat_readable || 'Unknown',
+          expiresAt: formattedToken?.exp_readable || 'Unknown',
+          subject: tokenPayload?.sub,
+          issuer: tokenPayload?.iss,
+          audience: tokenPayload?.aud,
+          scopes: tokenPayload?.scope,
+        };
+      } else {
+        logDetails.accessTokenStatus = 'No access token available in session - Check NextAuth configuration';
+      }
+
       addLog({
         action: 'User logged in successfully',
         type: 'login',
-        details: {
-          user: {
-            name: session.user?.name || undefined,
-            email: session.user?.email || undefined,
-          },
-          provider: 'Keycloak',
-        },
+        details: logDetails,
       });
       router.push('/chat');
     }
   }, [session, router, addLog]);
 
   const handleLogin = () => {
+    console.log('[Login] User clicked login button');
+    
     addLog({
       action: 'User initiated login',
       type: 'login',
       details: {
         provider: 'Keycloak',
         redirectUrl: '/chat',
+        timestamp: new Date().toISOString(),
       },
     });
+    
+    console.log('[Login] Log added, redirecting to Keycloak...');
     signIn('keycloak', { callbackUrl: '/chat' });
   };
 
@@ -49,8 +104,10 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-easyjet-orange to-easyjet-orange-dark flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8 animate-fade-in">
+    <>
+      <DebugPane />
+      <main className="min-h-screen bg-gradient-to-br from-easyjet-orange to-easyjet-orange-dark flex items-center justify-center p-4">
+        <div className="max-w-md w-full space-y-8 animate-fade-in">
         {/* Logo and Brand */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
@@ -97,7 +154,8 @@ export default function Home() {
           <p>💬 24/7 AI assistance</p>
           <p>🎫 Manage bookings easily</p>
         </div>
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   );
 }

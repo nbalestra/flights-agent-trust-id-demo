@@ -1,13 +1,32 @@
 'use client';
 
+import React, { useState } from 'react';
 import { useDebug, type DebugLogEntry } from '@/contexts/DebugContext';
 import { X, ChevronDown, ChevronRight, Trash2, Search, ShoppingCart, LogIn, AlertCircle, Info } from 'lucide-react';
-import { useState } from 'react';
 
 export function DebugPane() {
-  const { logs, clearLogs, latestLog } = useDebug();
+  const { logs, clearLogs, latestLog, addLog } = useDebug();
   const [isOpen, setIsOpen] = useState(true);
-  const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set([latestLog?.id || '']));
+  const [expandedLogs, setExpandedLogs] = useState<Set<string>>(() => {
+    // Auto-expand the latest log
+    return latestLog?.id ? new Set([latestLog.id]) : new Set();
+  });
+
+  // Auto-expand the latest log when it changes
+  React.useEffect(() => {
+    if (latestLog?.id) {
+      setExpandedLogs((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(latestLog.id);
+        return newSet;
+      });
+    }
+  }, [latestLog?.id]);
+
+  // Log when logs change
+  React.useEffect(() => {
+    console.log('[DebugPane] Logs updated, count:', logs.length);
+  }, [logs.length]);
 
   const toggleExpand = (logId: string) => {
     setExpandedLogs((prev) => {
@@ -72,6 +91,23 @@ export function DebugPane() {
           <span className="text-xs text-gray-500">({logs.length})</span>
         </div>
         <div className="flex items-center space-x-2">
+          <button
+            onClick={() => {
+              addLog({
+                action: 'Test log entry',
+                type: 'info',
+                details: {
+                  test: true,
+                  timestamp: new Date().toISOString(),
+                  message: 'This is a test to verify debug pane is working',
+                },
+              });
+            }}
+            className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            title="Add test log"
+          >
+            Test
+          </button>
           <button
             onClick={clearLogs}
             className="p-1 hover:bg-gray-200 rounded transition-colors"
@@ -220,17 +256,102 @@ export function DebugPane() {
                       </div>
                     )}
 
+                    {/* Session Info */}
+                    {log.details.sessionInfo && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Session Info:</span>
+                        <div className="ml-2 mt-1 p-2 bg-white rounded border border-gray-200 text-xs">
+                          <div>Has Access Token: {log.details.sessionInfo.hasAccessToken ? '✅ Yes' : '❌ No'}</div>
+                          <div>Has ID Token: {log.details.sessionInfo.hasIdToken ? '✅ Yes' : '❌ No'}</div>
+                          <div>Has Refresh Token: {log.details.sessionInfo.hasRefreshToken ? '✅ Yes' : '❌ No'}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Access Token (special handling) */}
+                    {log.details.accessToken && (
+                      <div>
+                        <span className="font-semibold text-gray-700">Access Token:</span>
+                        <div className="ml-2 mt-1 space-y-2">
+                          {typeof log.details.accessToken === 'object' && log.details.accessToken.decoded ? (
+                            <>
+                              {/* Key Token Fields */}
+                              <div className="p-2 bg-white rounded border border-gray-200 text-xs space-y-1">
+                                {log.details.accessToken.subject && (
+                                  <div><span className="font-semibold">Subject:</span> {log.details.accessToken.subject}</div>
+                                )}
+                                {log.details.accessToken.issuer && (
+                                  <div><span className="font-semibold">Issuer:</span> {log.details.accessToken.issuer}</div>
+                                )}
+                                {log.details.accessToken.issuedAt && (
+                                  <div><span className="font-semibold">Issued:</span> {log.details.accessToken.issuedAt}</div>
+                                )}
+                                {log.details.accessToken.expiresAt && (
+                                  <div><span className="font-semibold">Expires:</span> {log.details.accessToken.expiresAt}</div>
+                                )}
+                                {log.details.accessToken.scopes && (
+                                  <div><span className="font-semibold">Scopes:</span> {log.details.accessToken.scopes}</div>
+                                )}
+                              </div>
+                              
+                              {/* Full Decoded Token (collapsible) */}
+                              <details className="cursor-pointer">
+                                <summary className="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                                  View Full Decoded Token
+                                </summary>
+                                <pre className="mt-2 p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto">
+                                  {JSON.stringify(log.details.accessToken.decoded, null, 2)}
+                                </pre>
+                              </details>
+
+                              {/* Raw Token (collapsible) */}
+                              <details className="cursor-pointer">
+                                <summary className="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                                  View Raw Token
+                                </summary>
+                                <pre className="mt-2 p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto break-all">
+                                  {log.details.accessToken.raw}
+                                </pre>
+                              </details>
+                            </>
+                          ) : (
+                            <div className="text-gray-500 text-xs">
+                              {String(log.details.accessToken)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Raw Session (for debugging) */}
+                    {log.details.rawSession && (
+                      <details className="cursor-pointer">
+                        <summary className="text-xs font-semibold text-purple-600 hover:text-purple-800">
+                          View Raw Session Object
+                        </summary>
+                        <pre className="mt-2 p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto">
+                          {log.details.rawSession}
+                        </pre>
+                      </details>
+                    )}
+
                     {/* Other Details */}
                     {Object.entries(log.details).map(([key, value]) => {
-                      if (['userQuery', 'detectedIntent', 'agentType', 'response', 'error', 'user'].includes(key)) {
+                      if (['userQuery', 'detectedIntent', 'agentType', 'response', 'error', 'user', 'accessToken', 'sessionInfo', 'rawSession'].includes(key)) {
                         return null;
                       }
                       return (
                         <div key={key}>
                           <span className="font-semibold text-gray-700">{key}:</span>
-                          <span className="ml-2 text-gray-600">
-                            {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
-                          </span>
+                          <div className="ml-2 text-gray-600 mt-1">
+                            {typeof value === 'object' ? (
+                              <pre className="p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto">
+                                {JSON.stringify(value, null, 2)}
+                              </pre>
+                            ) : (
+                              <span>{String(value)}</span>
+                            )}
+                          </div>
                         </div>
                       );
                     })}

@@ -20,17 +20,46 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, account }) {
       // Persist the OAuth access_token to the token right after signin
       if (account) {
+        console.log('[NextAuth JWT] Account received:', {
+          hasAccessToken: !!account.access_token,
+          hasIdToken: !!account.id_token,
+          hasRefreshToken: !!account.refresh_token,
+          accessTokenLength: account.access_token?.length,
+        });
+        
         token.accessToken = account.access_token;
         token.idToken = account.id_token;
         token.refreshToken = account.refresh_token;
       }
+      
+      console.log('[NextAuth JWT] Token state:', {
+        hasAccessToken: !!token.accessToken,
+        hasIdToken: !!token.idToken,
+        hasRefreshToken: !!token.refreshToken,
+      });
+      
       return token;
     },
     async session({ session, token }) {
+      console.log('[NextAuth Session] Creating session with token:', {
+        hasAccessToken: !!token.accessToken,
+        hasIdToken: !!token.idToken,
+        hasRefreshToken: !!token.refreshToken,
+      });
+      
       // Send properties to the client
       if (token) {
         session.accessToken = token.accessToken as string;
+        session.idToken = token.idToken as string;
+        session.refreshToken = token.refreshToken as string;
       }
+      
+      console.log('[NextAuth Session] Session created:', {
+        hasAccessToken: !!session.accessToken,
+        hasIdToken: !!(session as any).idToken,
+        hasUser: !!session.user,
+      });
+      
       return session;
     },
   },
