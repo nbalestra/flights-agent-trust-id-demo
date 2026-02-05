@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --easyjet-orange: #FF6600;
+    --easyjet-orange-dark: #E55A00;
+    --easyjet-orange-light: #FF8533;
+  }
+
+  body {
+    @apply bg-white text-easyjet-gray;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-easyjet-orange hover:bg-easyjet-orange-dark text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-easyjet-orange border-2 border-easyjet-orange font-semibold py-3 px-6 rounded-lg transition-all duration-200 active:scale-95;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-lg p-6 border border-gray-100;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-easyjet-orange focus:outline-none transition-colors;
+  }
+
+  .chat-message {
+    @apply rounded-2xl px-4 py-3 max-w-[80%] break-words;
+  }
+
+  .chat-message-user {
+    @apply bg-easyjet-orange text-white ml-auto;
+  }
+
+  .chat-message-assistant {
+    @apply bg-gray-100 text-gray-800 mr-auto;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #FF6600;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #E55A00;
+}
