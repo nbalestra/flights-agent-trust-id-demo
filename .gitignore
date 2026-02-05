@@ -6,15 +6,20 @@ package-lock.json
 
 # Testing
 /coverage
+**/coverage
 
 # Next.js
 /.next/
 /out/
 .next
+**/.next/
+**/out/
 
 # Production
 /build
 dist/
+**/build
+**/dist/
 
 # Misc
 .DS_Store
