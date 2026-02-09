@@ -2,6 +2,8 @@
 
 A Python AI agent for flight search using **LangChain**, **AWS Bedrock**, and the **A2A Protocol** with **JSON-RPC 2.0** interface.
 
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 ## Features
 
 - ✅ **A2A Protocol Compliant**: Full Agent2Agent protocol using [official SDK](https://github.com/a2aproject/a2a-python)

@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     
     # Server Configuration
     host: str = "0.0.0.0"
-    port: int = 5000
+    port: int = 5000  # Note: Heroku overrides this with $PORT env var
     log_level: str = "INFO"
     
     # AWS Bedrock Configuration

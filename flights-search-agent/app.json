@@ -1,0 +1,62 @@
+{
+  "name": "Flight Search Agent - A2A Protocol",
+  "description": "AI-powered flight search agent using LangChain, AWS Bedrock, and A2A Protocol",
+  "repository": "https://github.com/yourusername/flights-agent-trust-id-demo",
+  "keywords": ["python", "ai", "a2a", "langchain", "aws-bedrock", "flight-search"],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "env": {
+    "AWS_REGION": {
+      "description": "AWS region for Bedrock",
+      "value": "us-east-2",
+      "required": true
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "description": "AWS access key for Bedrock",
+      "required": true
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "description": "AWS secret access key",
+      "required": true
+    },
+    "BEDROCK_MODEL_ID": {
+      "description": "AWS Bedrock model ID",
+      "value": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "required": true
+    },
+    "APP_NAME": {
+      "description": "Application name",
+      "value": "Flight Search Agent",
+      "required": false
+    },
+    "ENVIRONMENT": {
+      "description": "Environment name",
+      "value": "production",
+      "required": false
+    },
+    "LOG_LEVEL": {
+      "description": "Logging level",
+      "value": "INFO",
+      "required": false
+    },
+    "MCP_ENABLED": {
+      "description": "Enable MCP server",
+      "value": "true",
+      "required": false
+    },
+    "MCP_SERVER_URL": {
+      "description": "MCP server URL",
+      "value": "http://localhost:8080",
+      "required": false
+    }
+  }
+}

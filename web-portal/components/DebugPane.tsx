@@ -169,7 +169,7 @@ export function DebugPane() {
                   </div>
                   {log.details.userQuery && (
                     <p className="text-xs text-gray-600 truncate">
-                      Query: "{log.details.userQuery}"
+                      Query: &quot;{log.details.userQuery}&quot;
                     </p>
                   )}
                 </div>
@@ -200,7 +200,7 @@ export function DebugPane() {
                       <div>
                         <span className="font-semibold text-gray-700">User Query:</span>
                         <p className="ml-2 text-gray-600 mt-1 p-2 bg-white rounded border border-gray-200 break-words">
-                          "{log.details.userQuery}"
+                          &quot;{log.details.userQuery}&quot;
                         </p>
                       </div>
                     )}

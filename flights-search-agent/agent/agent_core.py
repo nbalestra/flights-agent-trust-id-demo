@@ -7,7 +7,8 @@ import json
 import boto3
 
 from langchain_aws import ChatBedrock
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+ 
+from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
@@ -48,7 +49,6 @@ class FlightSearchAgent:
         try:
             # Create LangChain ChatBedrock with Converse API
             # Credentials are already set in environment by config.py
-            # The beta_use_converse_api flag ensures proper message formatting for Claude 3
             llm = ChatBedrock(
                 credentials_profile_name=None,
                 region_name=settings.aws_region,
@@ -58,8 +58,7 @@ class FlightSearchAgent:
                     "top_p": 0.9,
                     "max_tokens": 4096,
                 },
-                # CRITICAL: Use Converse API for proper request formatting
-                # This fixes the "required key [messages] not found" error
+                # Use Converse API for proper message formatting
                 beta_use_converse_api=True,
             )
             

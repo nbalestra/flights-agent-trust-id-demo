@@ -1,0 +1,16 @@
+# Files to ignore during Heroku deployment
+*.md
+!README.md
+!QUICKSTART.md
+tests/
+test_*.py
+venv/
+.env.local
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+.git/
+.DS_Store
+diagnose_credentials.py
+verify_config.py

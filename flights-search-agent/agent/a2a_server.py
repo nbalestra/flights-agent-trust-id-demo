@@ -36,7 +36,10 @@ class FlightSearchAgentExecutor(AgentExecutor):
     """
     AgentExecutor implementation that wraps the LangChain agent.
     """
-    
+
+    # In-memory storage for chat histories keyed by context_id
+    _chat_histories: dict[str, list[dict]] = {}
+
     def __init__(self):
         """Initialize the agent executor."""
         self.langchain_agent = get_agent()
@@ -68,12 +71,14 @@ class FlightSearchAgentExecutor(AgentExecutor):
             # Extract text from message parts
             user_message = self._extract_text_from_parts(message.parts)
             logger.info(f"Executing agent for task {task.id}: {user_message[:100]}...")
-            
-            # Get context history if available
-            chat_history = None
-            if hasattr(message, 'context_group_id') and message.context_group_id:
-                chat_history = await self._get_chat_history(message.context_group_id)
-            
+
+            # Get context history using task.context_id
+            context_id = task.context_id
+            chat_history = await self._get_chat_history(context_id)
+
+            # Store the user message in history
+            self._store_chat_message(context_id, "user", user_message)
+
             # Process with LangChain agent
             result = await self.langchain_agent.chat(
                 message=user_message,
@@ -82,9 +87,23 @@ class FlightSearchAgentExecutor(AgentExecutor):
             
             # Handle response
             if result.get("success"):
-                response_text = result["message"]
+                raw_message = result["message"]
+    
+    # --- ADD THIS EXTRACTION LOGIC ---
+                if isinstance(raw_message, list):
+                   # Extract the 'text' value from the first item in the list if it's a dict
+                   if len(raw_message) > 0 and isinstance(raw_message[0], dict):
+                    response_text = raw_message[0].get("text", str(raw_message))
+                   else:
+                    response_text = str(raw_message)
+                else:
+                    response_text = raw_message
+    # ---------------------------------
                 logger.info(f"Agent response ready: {response_text[:100]}...")
-                
+
+                # Store the assistant response in history
+                self._store_chat_message(context_id, "assistant", response_text)
+
                 # Detect if the agent is asking for more information
                 is_asking_questions = self._is_asking_for_input(response_text)
                 
@@ -206,7 +225,7 @@ class FlightSearchAgentExecutor(AgentExecutor):
         return AgentCard(
             name="Flight Search Agent",
             description="AI-powered flight search agent using LangChain and AWS Bedrock",
-            url="http://localhost:5000",
+            url="https://a2a-flight-search-agent-21a3ba068989.herokuapp.com/agent",
             version="1.0.0",
             defaultInputModes=["STREAM"],  # Required field
             defaultOutputModes=["STREAM"],  # Required field
@@ -286,6 +305,15 @@ class FlightSearchAgentExecutor(AgentExecutor):
             "?",  # Contains question marks
         ]
         
+        if isinstance(response_text, list):
+            # Extract content from LangChain message objects if necessary
+            response_text = " ".join([
+              m.content if hasattr(m, 'content') else str(m) 
+              for m in response_text
+            ])
+        else:
+            response_text = response_text
+        
         response_lower = response_text.lower()
         
         # Check if response contains question indicators
@@ -335,17 +363,36 @@ class FlightSearchAgentExecutor(AgentExecutor):
             
         return extracted_text
     
-    async def _get_chat_history(self, context_group_id: str) -> Optional[List[dict]]:
+    async def _get_chat_history(self, context_id: str) -> Optional[List[dict]]:
         """
-        Retrieve chat history for a context group.
-        
-        In a production implementation, this would fetch from a database.
-        For now, we return None (no history).
+        Retrieve chat history for a context.
+
+        Uses in-memory storage to maintain conversation context.
         """
-        # TODO: Implement context group storage/retrieval
-        # This could use Redis, PostgreSQL, or in-memory storage
-        logger.debug(f"Context group {context_group_id} - history not implemented yet")
-        return None
+        history = self._chat_histories.get(context_id)
+        if history:
+            logger.debug(f"Retrieved {len(history)} messages for context {context_id}")
+        else:
+            logger.debug(f"No history found for context {context_id}")
+        return history
+
+    def _store_chat_message(self, context_id: str, role: str, content: str) -> None:
+        """
+        Store a chat message in the history for a context.
+
+        Args:
+            context_id: The context identifier
+            role: 'user' or 'assistant'
+            content: The message content
+        """
+        if context_id not in self._chat_histories:
+            self._chat_histories[context_id] = []
+
+        self._chat_histories[context_id].append({
+            "role": role,
+            "content": content
+        })
+        logger.debug(f"Stored {role} message for context {context_id}, total messages: {len(self._chat_histories[context_id])}")
 
 
 # Create A2A components

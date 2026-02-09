@@ -74,6 +74,11 @@ export async function POST(request: NextRequest) {
       agentType
     );
 
+    // Extract A2A specific data
+    const a2aState = response.data?.state;
+    const needsInput = response.data?.needsInput;
+    const isMock = response.data?.mock;
+
     return NextResponse.json({
       success: true,
       data: {
@@ -81,6 +86,9 @@ export async function POST(request: NextRequest) {
         intent: detectedIntent,
         agentType,
         intentDetectionError,
+        a2aState,
+        needsInput,
+        isMock,
       },
     });
   } catch (error) {

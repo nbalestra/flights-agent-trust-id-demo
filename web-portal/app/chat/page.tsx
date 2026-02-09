@@ -3,7 +3,8 @@
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { LogOut, Plane, Send, Loader2 } from 'lucide-react';
+import { LogOut, Plane, Send, Loader2, RefreshCw } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import type { ChatMessage } from '@/types';
 import { useDebug } from '@/contexts/DebugContext';
 import { DebugPane } from '@/components/DebugPane';
@@ -87,7 +88,7 @@ export default function ChatPage() {
         setConversationId(data.data.conversationId);
       }
 
-      // Log the action with intent detection
+      // Log the action with intent detection and A2A state
       if (data.data.intent) {
         addLog({
           action: `Query processed - ${data.data.intent === 'BOOKING' ? 'Booking' : 'Search'} intent detected`,
@@ -98,6 +99,9 @@ export default function ChatPage() {
             agentType: data.data.agentType,
             response: data.data.message,
             conversationId: data.data.conversationId,
+            a2aState: data.data.a2aState,
+            needsInput: data.data.needsInput,
+            isMock: data.data.isMock,
           },
         });
       }
@@ -106,10 +110,12 @@ export default function ChatPage() {
       if (data.data.intent) {
         const intentIcon = data.data.intent === 'BOOKING' ? '🎫' : '🔍';
         const intentText = data.data.intent === 'BOOKING' ? 'Booking' : 'Searching';
+        const sourceText = data.data.isMock ? '(Mock)' : '(A2A)';
+        const stateText = data.data.a2aState ? ` | State: ${data.data.a2aState}` : '';
         const intentMessage: ChatMessage = {
           id: Date.now().toString() + '-intent',
           role: 'system',
-          content: `${intentIcon} Intent detected: ${intentText}`,
+          content: `${intentIcon} Intent: ${intentText} → ${data.data.agentType} agent ${sourceText}${stateText}`,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, intentMessage]);
@@ -169,6 +175,30 @@ export default function ChatPage() {
     signOut({ callbackUrl: '/' });
   };
 
+  const handleNewChat = () => {
+    // Reset conversation state
+    setConversationId(null);
+    setMessages([
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: `Hello ${session?.user?.name || 'there'}! 👋 Welcome to EasyJetlag. I'm your AI travel assistant. How can I help you today?`,
+        timestamp: new Date(),
+      },
+    ]);
+    setInputMessage('');
+
+    // Log the action
+    addLog({
+      action: 'New chat started',
+      type: 'info',
+      details: {
+        previousConversationId: conversationId,
+        message: 'Context cleared, starting fresh conversation',
+      },
+    });
+  };
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-easyjet-orange to-easyjet-orange-dark">
@@ -208,6 +238,15 @@ export default function ChatPage() {
                 <p className="text-xs text-gray-500">{session.user?.email}</p>
               </div>
               <button
+                onClick={handleNewChat}
+                disabled={isLoading}
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-easyjet-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Start a new conversation"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span className="hidden sm:inline">New Chat</span>
+              </button>
+              <button
                 onClick={handleSignOut}
                 className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-easyjet-orange transition-colors"
               >
@@ -240,7 +279,13 @@ export default function ChatPage() {
                       : 'chat-message-assistant'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  {message.role === 'assistant' ? (
+                    <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:my-2 prose-pre:my-2 prose-pre:bg-gray-800 prose-pre:text-gray-100 prose-code:text-easyjet-orange prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  )}
                   {message.status === 'error' && (
                     <p className="text-xs mt-1 opacity-70">Failed to send</p>
                   )}
