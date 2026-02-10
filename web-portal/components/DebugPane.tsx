@@ -2,7 +2,47 @@
 
 import React, { useState } from 'react';
 import { useDebug, type DebugLogEntry } from '@/contexts/DebugContext';
-import { X, ChevronDown, ChevronRight, Trash2, Search, ShoppingCart, LogIn, AlertCircle, Info } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, Trash2, Search, ShoppingCart, LogIn, AlertCircle, Info, Copy, Check } from 'lucide-react';
+
+// Copy button component with feedback
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`inline-flex items-center space-x-1 px-2 py-1 text-xs rounded transition-colors ${
+        copied
+          ? 'bg-green-100 text-green-700'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+      }`}
+      title={`Copy ${label}`}
+    >
+      {copied ? (
+        <>
+          <Check className="w-3 h-3" />
+          <span>Copied!</span>
+        </>
+      ) : (
+        <>
+          <Copy className="w-3 h-3" />
+          <span>Copy {label}</span>
+        </>
+      )}
+    </button>
+  );
+}
 
 export function DebugPane() {
   const { logs, clearLogs, latestLog, addLog } = useDebug();
@@ -299,9 +339,17 @@ export function DebugPane() {
                                 <summary className="text-xs font-semibold text-blue-600 hover:text-blue-800">
                                   View Full Decoded Token
                                 </summary>
-                                <pre className="mt-2 p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto">
-                                  {JSON.stringify(log.details.accessToken.decoded, null, 2)}
-                                </pre>
+                                <div className="mt-2">
+                                  <div className="flex justify-end mb-1">
+                                    <CopyButton
+                                      text={JSON.stringify(log.details.accessToken.decoded, null, 2)}
+                                      label="Decoded"
+                                    />
+                                  </div>
+                                  <pre className="p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto">
+                                    {JSON.stringify(log.details.accessToken.decoded, null, 2)}
+                                  </pre>
+                                </div>
                               </details>
 
                               {/* Raw Token (collapsible) */}
@@ -309,9 +357,17 @@ export function DebugPane() {
                                 <summary className="text-xs font-semibold text-blue-600 hover:text-blue-800">
                                   View Raw Token
                                 </summary>
-                                <pre className="mt-2 p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto break-all">
-                                  {log.details.accessToken.raw}
-                                </pre>
+                                <div className="mt-2">
+                                  <div className="flex justify-end mb-1">
+                                    <CopyButton
+                                      text={log.details.accessToken.raw}
+                                      label="Raw Token"
+                                    />
+                                  </div>
+                                  <pre className="p-2 bg-white rounded border border-gray-200 text-xs overflow-x-auto break-all">
+                                    {log.details.accessToken.raw}
+                                  </pre>
+                                </div>
                               </details>
                             </>
                           ) : (

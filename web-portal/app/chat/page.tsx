@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import type { ChatMessage } from '@/types';
 import { useDebug } from '@/contexts/DebugContext';
 import { DebugPane } from '@/components/DebugPane';
+import { decodeJWT, formatJWTPayload } from '@/lib/jwt-utils';
 
 export default function ChatPage() {
   const { data: session, status } = useSession();
@@ -24,6 +25,79 @@ export default function ChatPage() {
       router.push('/');
     }
   }, [status, router]);
+
+  // Handle token refresh errors - force re-authentication
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') {
+      console.log('[Chat] Token refresh failed, forcing re-authentication');
+      addLog({
+        action: 'Session expired',
+        type: 'error',
+        details: {
+          message: 'Access token expired and refresh failed. Re-authenticating...',
+        },
+      });
+      // Force sign out and redirect to login to get fresh tokens
+      signOut({ callbackUrl: '/' });
+    }
+  }, [session?.error, addLog]);
+
+  // Log session info when chat page loads (for SSO scenarios where login page is skipped)
+  const [hasLoggedSession, setHasLoggedSession] = useState(false);
+  useEffect(() => {
+    if (session && !hasLoggedSession) {
+      console.log('[Chat] Session loaded:', {
+        hasAccessToken: !!session.accessToken,
+        accessTokenLength: session.accessToken?.length,
+        user: session.user?.email,
+      });
+
+      // Decode access token if available
+      let tokenPayload = null;
+      let formattedToken = null;
+
+      if (session.accessToken) {
+        tokenPayload = decodeJWT(session.accessToken);
+        if (tokenPayload) {
+          formattedToken = formatJWTPayload(tokenPayload);
+        }
+      }
+
+      const logDetails: Record<string, unknown> = {
+        user: {
+          name: session.user?.name || undefined,
+          email: session.user?.email || undefined,
+        },
+        sessionInfo: {
+          hasAccessToken: !!session.accessToken,
+          hasIdToken: !!session.idToken,
+          hasRefreshToken: !!session.refreshToken,
+        },
+      };
+
+      if (session.accessToken && tokenPayload) {
+        logDetails.accessToken = {
+          raw: session.accessToken,
+          decoded: formattedToken,
+          issuedAt: formattedToken?.iat_readable || 'Unknown',
+          expiresAt: formattedToken?.exp_readable || 'Unknown',
+          subject: tokenPayload?.sub,
+          issuer: tokenPayload?.iss,
+          scopes: tokenPayload?.scope,
+        };
+      } else {
+        logDetails.accessTokenStatus = 'No access token in session';
+      }
+
+      addLog({
+        action: 'Session loaded on chat page',
+        type: 'info',
+        details: logDetails,
+      });
+
+      setHasLoggedSession(true);
+    }
+  }, [session, hasLoggedSession, addLog]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

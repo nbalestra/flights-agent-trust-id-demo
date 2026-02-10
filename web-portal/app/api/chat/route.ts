@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
           userName: session.user?.name,
           detectedIntent,
         },
+        accessToken: session.accessToken,
       },
       agentType
     );

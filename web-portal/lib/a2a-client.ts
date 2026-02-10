@@ -230,12 +230,20 @@ export class A2AClient {
 
       // Call the A2A agent
       try {
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+
+        // Add Authorization header if access token is provided
+        if (request.accessToken) {
+          headers['Authorization'] = `Bearer ${request.accessToken}`;
+          console.log('[A2A] Including access token in request');
+        }
+
         const response = await fetch(agentUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
+          headers,
           body: JSON.stringify(a2aRequest)
         });
 
@@ -262,10 +270,7 @@ export class A2AClient {
 
           const retryResponse = await fetch(agentUrl, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
+            headers,
             body: JSON.stringify(retryRequest)
           });
 

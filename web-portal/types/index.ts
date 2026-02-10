@@ -118,6 +118,7 @@ export interface A2ARequest {
   message: string;
   conversationId?: string;
   context?: Record<string, any>;
+  accessToken?: string;
 }
 
 export interface A2AResponse {
