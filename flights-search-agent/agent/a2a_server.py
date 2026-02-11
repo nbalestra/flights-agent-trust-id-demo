@@ -1,9 +1,12 @@
 """
 A2A Protocol server implementation wrapping the LangChain agent.
 """
+import base64
+import json
 import logging
 import uuid
-from typing import Optional, List, AsyncIterator
+import contextvars
+from typing import Optional, List, AsyncIterator, Any
 from datetime import datetime
 
 from a2a.types import (
@@ -31,6 +34,57 @@ from agent.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Context var for request-scoped bearer token (set by middleware from Authorization header)
+_request_bearer_token_var: contextvars.ContextVar[Optional[str]] = contextvars.ContextVar(
+    "request_bearer_token", default=None
+)
+
+
+def set_request_bearer_token(token: Optional[str]) -> None:
+    """Set the bearer token for the current request (called by middleware)."""
+    _request_bearer_token_var.set(token)
+
+
+def get_request_bearer_token() -> Optional[str]:
+    """Get the bearer token for the current request."""
+    try:
+        return _request_bearer_token_var.get()
+    except LookupError:
+        return None
+
+
+def _decode_jwt_payload(token: str) -> Any:
+    """
+    Decode the payload of a JWT without verification (payload only).
+    Returns the decoded payload as dict, or None if not a valid JWT.
+    """
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            return None
+        payload_b64 = parts[1]
+        # Add padding if needed for base64url
+        padding = 4 - len(payload_b64) % 4
+        if padding != 4:
+            payload_b64 += "=" * padding
+        payload_bytes = base64.urlsafe_b64decode(payload_b64)
+        return json.loads(payload_bytes)
+    except Exception:
+        return None
+
+
+def get_auth_metadata() -> dict[str, Any]:
+    """
+    Build metadata dict with bearer_token and bearer_token_decoded per A2A spec.
+    To be merged into Task.metadata, Message.metadata, TaskStatusUpdateEvent.metadata,
+    and TaskArtifactUpdateEvent.metadata.
+    """
+    raw = get_request_bearer_token()
+    if raw is None:
+        return {"exchange_token": None, "exchange_token_decoded": None}
+    decoded = _decode_jwt_payload(raw)
+    return {"exchange_token": raw, "exchange_token_decoded": decoded}
+
 
 class FlightSearchAgentExecutor(AgentExecutor):
     """
@@ -56,6 +110,9 @@ class FlightSearchAgentExecutor(AgentExecutor):
         Following the A2A samples pattern with TaskStatusUpdateEvent.
         """
         try:
+            # Auth metadata from request Authorization header (per A2A spec: metadata on Task/Message/events)
+            auth_metadata = get_auth_metadata()
+
             # Get the message and task from context
             message = context.message
             task = context.current_task
@@ -66,6 +123,9 @@ class FlightSearchAgentExecutor(AgentExecutor):
             # Create task if it doesn't exist
             if not task:
                 task = new_task(message)
+                # Add bearer_token and bearer_token_decoded to task metadata (A2A spec: Task.metadata)
+                existing = getattr(task, "metadata", None) or {}
+                task.metadata = {**existing, **auth_metadata}
                 await event_queue.enqueue_event(task)
             
             # Extract text from message parts
@@ -110,26 +170,35 @@ class FlightSearchAgentExecutor(AgentExecutor):
                 if is_asking_questions:
                     # Agent needs more input - return input_required state
                     logger.info("Agent is requesting more information - returning input_required state")
-                    
+                    input_required_msg = new_agent_text_message(
+                        response_text,
+                        task.context_id,
+                        task.id,
+                    )
+                    existing_msg_meta = getattr(input_required_msg, "metadata", None) or {}
+                    input_required_msg.metadata = {**existing_msg_meta, **auth_metadata}
                     await event_queue.enqueue_event(
                         TaskStatusUpdateEvent(
                             status=TaskStatus(
                                 state=TaskState.input_required,
-                                message=new_agent_text_message(
-                                    response_text,
-                                    task.context_id,
-                                    task.id,
-                                ),
+                                message=input_required_msg,
                             ),
                             final=True,
                             context_id=task.context_id,
                             task_id=task.id,
+                            metadata=auth_metadata,
                         )
                     )
                 else:
                     # Agent has complete answer - return completed state
                     logger.info("Agent has complete answer - returning completed state")
-                    
+                    result_artifact = new_text_artifact(
+                        name='flight_search_result',
+                        description='Flight search results',
+                        text=response_text,
+                    )
+                    existing_artifact_meta = getattr(result_artifact, "metadata", None) or {}
+                    result_artifact.metadata = {**existing_artifact_meta, **auth_metadata}
                     # First send the result as an artifact
                     await event_queue.enqueue_event(
                         TaskArtifactUpdateEvent(
@@ -137,14 +206,10 @@ class FlightSearchAgentExecutor(AgentExecutor):
                             context_id=task.context_id,
                             task_id=task.id,
                             last_chunk=True,
-                            artifact=new_text_artifact(
-                                name='flight_search_result',
-                                description='Flight search results',
-                                text=response_text,
-                            ),
+                            artifact=result_artifact,
+                            metadata=auth_metadata,
                         )
                     )
-                    
                     # Then send completed status
                     await event_queue.enqueue_event(
                         TaskStatusUpdateEvent(
@@ -152,49 +217,57 @@ class FlightSearchAgentExecutor(AgentExecutor):
                             final=True,
                             context_id=task.context_id,
                             task_id=task.id,
+                            metadata=auth_metadata,
                         )
                     )
             else:
                 # Handle error
                 error_text = result.get("error", "Unknown error occurred")
                 logger.error(f"Agent returned error: {error_text}")
-                
+                error_msg = new_agent_text_message(
+                    f"Error: {error_text}",
+                    task.context_id,
+                    task.id,
+                )
+                existing_error_meta = getattr(error_msg, "metadata", None) or {}
+                error_msg.metadata = {**existing_error_meta, **auth_metadata}
                 await event_queue.enqueue_event(
                     TaskStatusUpdateEvent(
                         status=TaskStatus(
                             state=TaskState.failed,
-                            message=new_agent_text_message(
-                                f"Error: {error_text}",
-                                task.context_id,
-                                task.id,
-                            ),
+                            message=error_msg,
                         ),
                         final=True,
                         context_id=task.context_id,
                         task_id=task.id,
+                        metadata=auth_metadata,
                     )
                 )
         
         except Exception as e:
             logger.error(f"Exception in agent execution: {e}", exc_info=True)
-            
+            auth_metadata = get_auth_metadata()
             # Try to send error status if we have task info
             try:
                 if context.current_task:
                     task = context.current_task
+                    exc_msg = new_agent_text_message(
+                        f"Error: {str(e)}",
+                        task.context_id,
+                        task.id,
+                    )
+                    existing_exc_meta = getattr(exc_msg, "metadata", None) or {}
+                    exc_msg.metadata = {**existing_exc_meta, **auth_metadata}
                     await event_queue.enqueue_event(
                         TaskStatusUpdateEvent(
                             status=TaskStatus(
                                 state=TaskState.failed,
-                                message=new_agent_text_message(
-                                    f"Error: {str(e)}",
-                                    task.context_id,
-                                    task.id,
-                                ),
+                                message=exc_msg,
                             ),
                             final=True,
                             context_id=task.context_id,
                             task_id=task.id,
+                            metadata=auth_metadata,
                         )
                     )
             except Exception as queue_error:

@@ -6,11 +6,14 @@ Uses JSON-RPC protocol with a single /agent endpoint.
 """
 import logging
 
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+
 from a2a.server.apps.jsonrpc import A2AFastAPIApplication
 from a2a.types import AgentCard
 
 from agent.config import settings
-from agent.a2a_server import get_request_handler, get_agent_executor_instance
+from agent.a2a_server import get_request_handler, get_agent_executor_instance, set_request_bearer_token
 
 # Configure logging
 logging.basicConfig(
@@ -71,6 +74,21 @@ app = a2a_jsonrpc_app.build(
     agent_card_url="/.well-known/agent-card.json",
     rpc_url="/agent"  # Single endpoint for all operations
 )
+
+
+class AuthorizationCaptureMiddleware(BaseHTTPMiddleware):
+    """Capture Authorization header and set bearer token in context for the request."""
+
+    async def dispatch(self, request: Request, call_next):
+        auth = request.headers.get("Authorization")
+        token = None
+        if auth and auth.strip().lower().startswith("bearer "):
+            token = auth[7:].strip()
+        set_request_bearer_token(token)
+        return await call_next(request)
+
+
+app.add_middleware(AuthorizationCaptureMiddleware)
 
 logger.info("A2A JSON-RPC FastAPI application built successfully")
 logger.info("A2A JSON-RPC endpoint:")
