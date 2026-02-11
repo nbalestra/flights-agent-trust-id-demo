@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 13,
+  "criticalExtensionOIDs": [
+    "ipsum",
+    "a"
+  ],
+  "extendedKeyUsage": [
+    "pulvinar",
+    "elit"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "libero"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Alejandrina",
+      "type": 90
+    }
+  ],
+  "issuerDN": {
+    "commonName": "dui",
+    "name": "Alysa"
+  },
+  "issuerUniqueID": [
+    true,
+    false,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Abigail"
+  },
+  "keyUsage": [
+    false,
+    true,
+    false
+  ],
+  "name": "Agustin",
+  "nonCriticalExtensionOIDs": [
+    "eget",
+    "dui"
+  ],
+  "publicKey": {
+    "algorithm": "Pellentesque",
+    "modulus": 90,
+    "params": 58,
+    "publicKey": "tincidunt"
+  },
+  "serialNumber": 6,
+  "serialNumberObject": {
+    "serialNumber": 1
+  },
+  "sigAlgName": "viverra",
+  "sigAlgOID": "dolor",
+  "subjectAlternativeNames": [
+    {
+      "name": "Daniel",
+      "type": 27
+    }
+  ],
+  "subjectDN": {
+    "commonName": "elit",
+    "name": "Alyse"
+  },
+  "subjectX500Principal": {
+    "name": "Damien"
+  },
+  "type": "Nam",
+  "version": 0
+}

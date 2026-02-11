@@ -1,0 +1,74 @@
+{
+  "basicConstraints": 91,
+  "criticalExtensionOIDs": [
+    "dolor",
+    "sodales"
+  ],
+  "extendedKeyUsage": [
+    "justo",
+    "at",
+    "ac"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "Fusce"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Claudio",
+      "type": 23
+    }
+  ],
+  "issuerDN": {
+    "commonName": "Fusce",
+    "name": "Alvera"
+  },
+  "issuerUniqueID": [
+    false,
+    true,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Anastasia"
+  },
+  "keyUsage": [
+    true,
+    true,
+    false
+  ],
+  "name": "Analisa",
+  "nonCriticalExtensionOIDs": [
+    "sodales",
+    "Nam",
+    "In"
+  ],
+  "publicKey": {
+    "algorithm": "Nunc",
+    "modulus": 71,
+    "params": 89,
+    "publicKey": "Aliquam"
+  },
+  "serialNumber": 11,
+  "serialNumberObject": {
+    "serialNumber": 17
+  },
+  "sigAlgName": "erat",
+  "sigAlgOID": "adipiscing",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alyce",
+      "type": 94
+    }
+  ],
+  "subjectDN": {
+    "commonName": "pretium",
+    "name": "Chadwick"
+  },
+  "subjectX500Principal": {
+    "name": "Anastacia"
+  },
+  "type": "arcu",
+  "version": 4
+}

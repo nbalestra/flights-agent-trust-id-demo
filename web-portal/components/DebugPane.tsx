@@ -1,8 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useDebug, type DebugLogEntry } from '@/contexts/DebugContext';
-import { X, ChevronDown, ChevronRight, Trash2, Search, ShoppingCart, LogIn, AlertCircle, Info, Copy, Check } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, Trash2, Search, ShoppingCart, LogIn, AlertCircle, Info, Copy, Check, GripVertical } from 'lucide-react';
+
+const DEFAULT_WIDTH = 550;
+const MIN_WIDTH = 350;
+const MAX_WIDTH = 900;
 
 // Copy button component with feedback
 function CopyButton({ text, label }: { text: string; label: string }) {
@@ -47,10 +51,48 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 export function DebugPane() {
   const { logs, clearLogs, latestLog, addLog } = useDebug();
   const [isOpen, setIsOpen] = useState(true);
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeRef = useRef<HTMLDivElement>(null);
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(() => {
     // Auto-expand the latest log
     return latestLog?.id ? new Set([latestLog.id]) : new Set();
   });
+
+  // Handle resize drag
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) return;
+    const newWidth = window.innerWidth - e.clientX;
+    setWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, newWidth)));
+  }, [isResizing]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
 
   // Auto-expand the latest log when it changes
   React.useEffect(() => {
@@ -122,7 +164,20 @@ export function DebugPane() {
   }
 
   return (
-    <div className="fixed top-16 right-0 h-[calc(100vh-4rem)] w-96 bg-white border-l border-gray-200 shadow-2xl flex flex-col z-40">
+    <div
+      ref={resizeRef}
+      className="fixed top-16 right-0 h-[calc(100vh-4rem)] bg-white border-l border-gray-200 shadow-2xl flex flex-col z-40"
+      style={{ width: `${width}px` }}
+    >
+      {/* Resize Handle */}
+      <div
+        onMouseDown={handleMouseDown}
+        className={`absolute left-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-easyjet-orange/20 transition-colors flex items-center justify-center group ${isResizing ? 'bg-easyjet-orange/30' : ''}`}
+      >
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <GripVertical className="w-3 h-3 text-gray-400" />
+        </div>
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center space-x-2">
@@ -391,9 +446,53 @@ export function DebugPane() {
                       </details>
                     )}
 
+                    {/* A2A Request */}
+                    {log.details.a2aRequest && (
+                      <div>
+                        <details className="cursor-pointer">
+                          <summary className="font-semibold text-blue-700 hover:text-blue-900">
+                            📤 A2A Request
+                          </summary>
+                          <div className="mt-2">
+                            <div className="flex justify-end mb-1">
+                              <CopyButton
+                                text={JSON.stringify(log.details.a2aRequest, null, 2)}
+                                label="Request"
+                              />
+                            </div>
+                            <pre className="p-2 bg-blue-50 rounded border border-blue-200 text-xs overflow-x-auto max-h-64 overflow-y-auto">
+                              {JSON.stringify(log.details.a2aRequest, null, 2)}
+                            </pre>
+                          </div>
+                        </details>
+                      </div>
+                    )}
+
+                    {/* A2A Response */}
+                    {log.details.a2aResponse && (
+                      <div>
+                        <details className="cursor-pointer">
+                          <summary className="font-semibold text-green-700 hover:text-green-900">
+                            📥 A2A Response
+                          </summary>
+                          <div className="mt-2">
+                            <div className="flex justify-end mb-1">
+                              <CopyButton
+                                text={JSON.stringify(log.details.a2aResponse, null, 2)}
+                                label="Response"
+                              />
+                            </div>
+                            <pre className="p-2 bg-green-50 rounded border border-green-200 text-xs overflow-x-auto max-h-64 overflow-y-auto">
+                              {JSON.stringify(log.details.a2aResponse, null, 2)}
+                            </pre>
+                          </div>
+                        </details>
+                      </div>
+                    )}
+
                     {/* Other Details */}
                     {Object.entries(log.details).map(([key, value]) => {
-                      if (['userQuery', 'detectedIntent', 'agentType', 'response', 'error', 'user', 'accessToken', 'sessionInfo', 'rawSession'].includes(key)) {
+                      if (['userQuery', 'detectedIntent', 'agentType', 'response', 'error', 'user', 'accessToken', 'sessionInfo', 'rawSession', 'a2aRequest', 'a2aResponse'].includes(key)) {
                         return null;
                       }
                       return (

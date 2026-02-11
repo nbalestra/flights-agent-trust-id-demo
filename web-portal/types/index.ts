@@ -22,10 +22,23 @@ export interface A2AAgentMessage {
   taskId?: string;
 }
 
+// A2A Auth Challenge - for step-up authentication
+export interface A2AAuthChallenge {
+  authorizationEndpoint: string;
+  tokenEndpoint: string;
+  codeChallengeMethod: 'S256' | 'plain';
+  redirectUri: string;
+  responseType: string;
+  scopes: string[];
+  secondaryAuthProvider: string;
+  clientId?: string;
+}
+
 // A2A Task Status
 export interface A2ATaskStatus {
-  state: 'submitted' | 'working' | 'input_required' | 'completed' | 'failed' | 'canceled';
+  state: 'submitted' | 'working' | 'input_required' | 'completed' | 'failed' | 'canceled' | 'auth-required';
   message?: A2AAgentMessage;
+  timestamp?: string;
 }
 
 // A2A Task Artifact
@@ -119,6 +132,8 @@ export interface A2ARequest {
   conversationId?: string;
   context?: Record<string, any>;
   accessToken?: string;
+  // Step-up Auth0 access token to include in message parts as auth_credentials
+  stepUpAccessToken?: string;
 }
 
 export interface A2AResponse {
@@ -128,6 +143,10 @@ export interface A2AResponse {
   error?: string;
   intent?: 'SEARCHING' | 'BOOKING';
   agentType?: 'booking' | 'search';
+  authChallenge?: A2AAuthChallenge;
+  // Raw A2A payloads for debugging
+  rawRequest?: any;
+  rawResponse?: any;
 }
 
 // Session Types

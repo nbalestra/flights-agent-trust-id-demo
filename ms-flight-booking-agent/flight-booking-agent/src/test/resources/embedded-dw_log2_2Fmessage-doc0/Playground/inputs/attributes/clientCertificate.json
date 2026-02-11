@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 84,
+  "criticalExtensionOIDs": [
+    "arcu",
+    "Aliquam"
+  ],
+  "extendedKeyUsage": [
+    "venenatis",
+    "Fusce"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "sit"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Amy",
+      "type": 73
+    }
+  ],
+  "issuerDN": {
+    "commonName": "molestie",
+    "name": "Alanna"
+  },
+  "issuerUniqueID": [
+    false,
+    false,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Agustina"
+  },
+  "keyUsage": [
+    true,
+    true,
+    true
+  ],
+  "name": "Ana",
+  "nonCriticalExtensionOIDs": [
+    "justo",
+    "nibh"
+  ],
+  "publicKey": {
+    "algorithm": "ut",
+    "modulus": 56,
+    "params": 93,
+    "publicKey": "ut"
+  },
+  "serialNumber": 7,
+  "serialNumberObject": {
+    "serialNumber": 71
+  },
+  "sigAlgName": "Fusce",
+  "sigAlgOID": "aliquam",
+  "subjectAlternativeNames": [
+    {
+      "name": "Clay",
+      "type": 76
+    }
+  ],
+  "subjectDN": {
+    "commonName": "molestie",
+    "name": "Cole"
+  },
+  "subjectX500Principal": {
+    "name": "Dan"
+  },
+  "type": "aliquam",
+  "version": 38
+}

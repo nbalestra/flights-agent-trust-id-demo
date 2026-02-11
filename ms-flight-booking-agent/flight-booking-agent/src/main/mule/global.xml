@@ -1,0 +1,40 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd   http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd   http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd   http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+  <!-- Configuration Properties -->
+  <configuration-properties doc:id="configuration-properties" doc:name="Configuration properties" file="config.properties"></configuration-properties>
+  <!-- HTTP Listener Configuration -->
+  <http:listener-config doc:name="HTTP Listener config" name="HTTP_Listener_config">
+    <http:listener-connection host="${http.host}" port="${http.port}" protocol="HTTP" />
+  </http:listener-config>
+  <!-- HTTP Request Configuration for External Flight API -->
+  <http:request-config doc:name="External Flight API Config" name="External_Flight_API_Config">
+    <http:request-connection host="${external.flight.api.host}" port="${external.flight.api.port}" protocol="${external.flight.api.protocol}"></http:request-connection>
+  </http:request-config>
+  <!-- HTTP Request Configuration for Bedrock AI -->
+  <http:request-config doc:name="Bedrock AI Config" name="Bedrock_AI_Config">
+    <http:request-connection host="bedrock-runtime.${bedrock.region}.amazonaws.com" protocol="HTTPS"></http:request-connection>
+  </http:request-config>
+  <!-- ObjectStore Configuration -->
+  <os:object-store doc:id="default-objectstore" doc:name="Default ObjectStore" name="Default_ObjectStore" persistent="true"></os:object-store>
+  <!-- Global Error Handler -->
+  <error-handler doc:name="Global Error Handler" name="globalErrorHandler">
+    <on-error-propagate doc:name="On Error Propagate" enableNotifications="true" logException="true">
+      <ee:transform doc:name="Transform Message">
+        <ee:message>
+          <ee:set-payload>
+            <![CDATA[%dw 2.0
+output application/json
+---
+{
+  "error": {
+    "type": error.errorType.identifier,
+    "description": error.description,
+    "timestamp": now(),
+    "correlationId": correlationId
+  }
+}]]>
+          </ee:set-payload>
+        </ee:message>
+      </ee:transform>
+    </on-error-propagate>
+  </error-handler>
+</mule>

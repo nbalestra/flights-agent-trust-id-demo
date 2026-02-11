@@ -1,0 +1,73 @@
+{
+  "basicConstraints": 82,
+  "criticalExtensionOIDs": [
+    "dictum",
+    "consectetur"
+  ],
+  "extendedKeyUsage": [
+    "erat",
+    "ipsum",
+    "pulvinar"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "consectetur"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Ahmed",
+      "type": 49
+    }
+  ],
+  "issuerDN": {
+    "commonName": "molestie",
+    "name": "Agustina"
+  },
+  "issuerUniqueID": [
+    true,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Christian"
+  },
+  "keyUsage": [
+    true,
+    true,
+    true
+  ],
+  "name": "Bud",
+  "nonCriticalExtensionOIDs": [
+    "dolor",
+    "Fusce",
+    "molestie"
+  ],
+  "publicKey": {
+    "algorithm": "sed",
+    "modulus": 98,
+    "params": 19,
+    "publicKey": "convallis"
+  },
+  "serialNumber": 9,
+  "serialNumberObject": {
+    "serialNumber": 58
+  },
+  "sigAlgName": "sit",
+  "sigAlgOID": "dolor",
+  "subjectAlternativeNames": [
+    {
+      "name": "Allena",
+      "type": 47
+    }
+  ],
+  "subjectDN": {
+    "commonName": "molestie",
+    "name": "Danilo"
+  },
+  "subjectX500Principal": {
+    "name": "Afton"
+  },
+  "type": "venenatis",
+  "version": 11
+}

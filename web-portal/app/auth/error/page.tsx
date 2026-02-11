@@ -18,7 +18,7 @@ export default function AuthError() {
           icon: <ShieldX className="w-12 h-12 text-red-600" />,
           title: 'Access Denied',
           message: 'You do not have permission to access this application.',
-          details: 'Your access token does not include EasyJetlag in its audience.',
+          details: 'Your access token does not include Jetlag Airlines in its audience.',
           requiredAudience: 'easyjetlag-app',
         };
       case 'Configuration':

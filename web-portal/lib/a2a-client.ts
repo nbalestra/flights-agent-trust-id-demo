@@ -6,7 +6,8 @@ import type {
   A2AJsonRpcResponse,
   A2AMessagePart,
   A2ATask,
-  A2AArtifact
+  A2AArtifact,
+  A2AAuthChallenge
 } from '@/types';
 
 export type AgentType = 'booking' | 'search';
@@ -57,7 +58,8 @@ export class A2AClient {
   private createA2ARequest(
     message: string,
     contextId?: string,
-    taskId?: string
+    taskId?: string,
+    stepUpAccessToken?: string
   ): A2AJsonRpcRequest {
     const messageId = uuidv4();
 
@@ -67,6 +69,19 @@ export class A2AClient {
         text: message
       }
     ];
+
+    // Include step-up auth credentials if provided
+    if (stepUpAccessToken) {
+      parts.push({
+        kind: 'data',
+        data: {
+          auth_credentials: {
+            accessToken: stepUpAccessToken
+          }
+        }
+      });
+      console.log('[A2A] Including step-up auth_credentials in message parts');
+    }
 
     const request: A2AJsonRpcRequest = {
       jsonrpc: '2.0',
@@ -91,6 +106,62 @@ export class A2AClient {
   }
 
   /**
+   * Extract auth challenge from A2A response message parts
+   */
+  private extractAuthChallenge(task: A2ATask): A2AAuthChallenge | undefined {
+    if (!task.status?.message?.parts) {
+      return undefined;
+    }
+
+    for (const part of task.status.message.parts) {
+      if (part.kind === 'data' && part.data?.authChallenge) {
+        return part.data.authChallenge as A2AAuthChallenge;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Clean response text by removing code block formatting
+   * This prevents Markdown from rendering text as code blocks or inline code
+   */
+  private cleanResponseText(text: string): string {
+    let cleaned = text.trim();
+
+    // Remove fenced code blocks (triple backticks) wrapping the entire content
+    // Match ```optional-language\n...content...\n``` pattern
+    const fencedCodeBlockRegex = /^```[\w]*\n?([\s\S]*?)\n?```$/;
+    const match = cleaned.match(fencedCodeBlockRegex);
+    if (match) {
+      cleaned = match[1];
+    }
+
+    // Also handle case where content starts/ends with just triple backticks
+    if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/^```[\w]*\n?/, '');
+    }
+    if (cleaned.endsWith('```')) {
+      cleaned = cleaned.replace(/\n?```$/, '');
+    }
+
+    // Process each line
+    return cleaned
+      .split('\n')
+      .map(line => {
+        // Trim leading/trailing whitespace
+        let lineCleaned = line.trim();
+        // Remove wrapping backticks (inline code)
+        if (lineCleaned.startsWith('`') && lineCleaned.endsWith('`') && lineCleaned.length > 2) {
+          lineCleaned = lineCleaned.slice(1, -1);
+        }
+        return lineCleaned;
+      })
+      .join('\n')
+      .trim();
+  }
+
+  /**
    * Extract text content from A2A response artifacts or status message
    */
   private extractResponseText(task: A2ATask): string {
@@ -107,7 +178,7 @@ export class A2AClient {
       }
 
       if (textParts.length > 0) {
-        return textParts.join('\n');
+        return this.cleanResponseText(textParts.join('\n'));
       }
     }
 
@@ -122,7 +193,7 @@ export class A2AClient {
       }
 
       if (textParts.length > 0) {
-        return textParts.join('\n');
+        return this.cleanResponseText(textParts.join('\n'));
       }
     }
 
@@ -134,7 +205,8 @@ export class A2AClient {
    */
   private parseA2AResponse(
     response: A2AJsonRpcResponse,
-    agentType: AgentType
+    agentType: AgentType,
+    rawRequest?: any
   ): A2AResponse {
     // Handle JSON-RPC error
     if (response.error) {
@@ -147,7 +219,9 @@ export class A2AClient {
           agentType,
           errorCode: response.error.code,
           errorDetails: response.error.data
-        }
+        },
+        rawRequest,
+        rawResponse: response
       };
     }
 
@@ -160,7 +234,9 @@ export class A2AClient {
         message: 'No response received from agent',
         conversationId: this.contextId || uuidv4(),
         error: 'Empty response',
-        data: { agentType }
+        data: { agentType },
+        rawRequest,
+        rawResponse: response
       };
     }
 
@@ -179,6 +255,18 @@ export class A2AClient {
     const state = task.status?.state || 'unknown';
     const isError = state === 'failed';
     const needsInput = state === 'input_required';
+    const needsAuth = state === 'auth-required';
+
+    // Extract auth challenge if auth is required
+    const authChallenge = needsAuth ? this.extractAuthChallenge(task) : undefined;
+
+    if (needsAuth && authChallenge) {
+      console.log('[A2A] Auth challenge detected:', {
+        provider: authChallenge.secondaryAuthProvider,
+        scopes: authChallenge.scopes,
+        authorizationEndpoint: authChallenge.authorizationEndpoint
+      });
+    }
 
     return {
       message: responseText || `Agent state: ${state}`,
@@ -189,9 +277,14 @@ export class A2AClient {
         contextId: task.contextId,
         state,
         needsInput,
-        artifacts: task.artifacts
+        needsAuth,
+        artifacts: task.artifacts,
+        agentUrl: this.getAgentUrl(agentType)
       },
-      ...(isError && { error: responseText || 'Agent execution failed' })
+      ...(authChallenge && { authChallenge }),
+      ...(isError && { error: responseText || 'Agent execution failed' }),
+      rawRequest,
+      rawResponse: response
     };
   }
 
@@ -209,10 +302,19 @@ export class A2AClient {
 
       // Create A2A JSON-RPC request
       const existingTaskId = this.taskIds.get(agentType);
+
+      console.log('[A2A] Creating request with message:', {
+        messageLength: request.message.length,
+        messagePreview: request.message.substring(0, 200),
+        containsFlightDetails: request.message.includes('Flight Details'),
+        hasStepUpToken: !!request.stepUpAccessToken,
+      });
+
       const a2aRequest = this.createA2ARequest(
         request.message,
         this.contextId || undefined,
-        existingTaskId
+        existingTaskId,
+        request.stepUpAccessToken
       );
 
       console.log(`[A2A] Sending to ${agentType} agent:`, {
@@ -265,7 +367,8 @@ export class A2AClient {
           const retryRequest = this.createA2ARequest(
             request.message,
             this.contextId || undefined,
-            undefined  // No task ID this time
+            undefined,  // No task ID this time
+            request.stepUpAccessToken
           );
 
           const retryResponse = await fetch(agentUrl, {
@@ -282,10 +385,10 @@ export class A2AClient {
 
           const retryData: A2AJsonRpcResponse = await retryResponse.json();
           console.log(`[A2A] Retry response from ${agentType} agent:`, JSON.stringify(retryData, null, 2));
-          return this.parseA2AResponse(retryData, agentType);
+          return this.parseA2AResponse(retryData, agentType, retryRequest);
         }
 
-        return this.parseA2AResponse(responseData, agentType);
+        return this.parseA2AResponse(responseData, agentType, a2aRequest);
 
       } catch (error) {
         console.error(`[A2A] Error calling ${agentType} agent:`, error);
@@ -369,10 +472,10 @@ export class A2AClient {
       } else if (lowerMessage.includes('flight') || lowerMessage.includes('search')) {
         message = `**Flight Search** (Mock)\n\nI can help you search for flights! Please provide:\n- Departure city\n- Destination\n- Travel dates\n- Number of passengers\n\nOnce the search agent is configured, you'll get real results!`;
       } else {
-        message = `Hello! Welcome to EasyJetlag. I'm your AI assistant. Based on your message, I'm routing you to the **${agentType}** service.\n\nNote: This is a mock response. Configure the ${agentType} agent URL for real functionality.`;
+        message = `Hello! Welcome to Jetlag Airlines. I'm your AI assistant. Based on your message, I'm routing you to the **${agentType}** service.\n\nNote: This is a mock response. Configure the ${agentType} agent URL for real functionality.`;
       }
     } else {
-      message = `Hello! Welcome to EasyJetlag. I'm your AI assistant. Based on your message, I'm routing you to the **${agentType}** service.\n\nNote: This is a mock response. Configure the ${agentType} agent URL for real functionality.`;
+      message = `Hello! Welcome to Jetlag Airlines. I'm your AI assistant. Based on your message, I'm routing you to the **${agentType}** service.\n\nNote: This is a mock response. Configure the ${agentType} agent URL for real functionality.`;
     }
 
     return {

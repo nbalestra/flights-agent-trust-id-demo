@@ -7,10 +7,10 @@ import { DebugProvider } from '@/contexts/DebugContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'EasyJetlag - Your Travel Companion',
-  description: 'Book flights and manage your travel with EasyJetlag',
-  keywords: 'flights, travel, booking, airline, EasyJetlag',
-  authors: [{ name: 'EasyJetlag' }],
+  title: 'Jetlag Airlines - Your Travel Companion',
+  description: 'Book flights and manage your travel with Jetlag Airlines',
+  keywords: 'flights, travel, booking, airline, Jetlag Airlines',
+  authors: [{ name: 'Jetlag Airlines' }],
   viewport: 'width=device-width, initial-scale=1',
   themeColor: '#FF6600',
 };

@@ -1,0 +1,73 @@
+{
+  "basicConstraints": 70,
+  "criticalExtensionOIDs": [
+    "adipiscing",
+    "ut",
+    "nunc"
+  ],
+  "extendedKeyUsage": [
+    "elit",
+    "convallis"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "vitae"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Charley",
+      "type": 68
+    }
+  ],
+  "issuerDN": {
+    "commonName": "pulvinar",
+    "name": "Burton"
+  },
+  "issuerUniqueID": [
+    true,
+    false,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Alec"
+  },
+  "keyUsage": [
+    true,
+    false
+  ],
+  "name": "Amanda",
+  "nonCriticalExtensionOIDs": [
+    "molestie",
+    "felis",
+    "sit"
+  ],
+  "publicKey": {
+    "algorithm": "eget",
+    "modulus": 29,
+    "params": 63,
+    "publicKey": "pretium"
+  },
+  "serialNumber": 53,
+  "serialNumberObject": {
+    "serialNumber": 76
+  },
+  "sigAlgName": "a",
+  "sigAlgOID": "at",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alvera",
+      "type": 86
+    }
+  ],
+  "subjectDN": {
+    "commonName": "nunc",
+    "name": "Damon"
+  },
+  "subjectX500Principal": {
+    "name": "Aline"
+  },
+  "type": "elit",
+  "version": 7
+}

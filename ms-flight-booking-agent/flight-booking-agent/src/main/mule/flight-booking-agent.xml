@@ -1,0 +1,293 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:a2a="http://www.mulesoft.org/schema/mule/a2a" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ms-bedrock="http://www.mulesoft.org/schema/mule/ms-bedrock" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd   http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd   http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/a2a http://www.mulesoft.org/schema/mule/a2a/current/mule-a2a.xsd  http://www.mulesoft.org/schema/mule/ms-bedrock http://www.mulesoft.org/schema/mule/ms-bedrock/current/mule-ms-bedrock.xsd  http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking.xsd">
+  <!-- Main Flight Booking Agent Flow (A2A Exposed Endpoint) -->
+  <a2a:server-config name="A2A-Server-Listener">
+    <a2a:connection agentPath="/booking-agent" listenerConfig="HTTP_Listener_config"></a2a:connection>
+    <a2a:agent-card>
+      <a2a:json>
+        <![CDATA[{
+    "name": "Flight Booking Agent",
+    "description": "An AI agent that handles flight bookings. It processes booking requests with origin, destination, time, and fare information to complete flight reservations.",
+    "url": "https://booking-agent.easyjetlag.com",
+    "provider": {
+      "organization": "EasyJetlag",
+      "url": "https://easyjetlag.com"
+    },
+    "version": "1.0.0",
+    "documentationUrl": "https://docs.easyjetlag.com/agents/booking",
+    "capabilities": {
+      "streaming": false,
+      "pushNotifications": false,
+      "stateTransitionHistory": true
+    },
+    "authentication": {
+      "schemes": ["bearer"],
+      "credentials": "Authorization header with Bearer token"
+    },
+    "defaultInputModes": ["text/plain", "application/json"],
+    "defaultOutputModes": ["text/plain", "application/json"],
+    "skills": [
+      {
+        "id": "booking",
+        "name": "Book Flight",
+        "description": "Books a flight with the specified origin, destination, departure time, and fare class.",
+        "tags": ["flights", "booking", "travel", "reservation"],
+        "examples": [
+          "Book a flight from London Gatwick to Paris CHarles de Gaulle at 10:00 AM with economy fare",
+          "Reserve a business class seat from JFK to LAX departing at 14:30"
+        ],
+        "inputModes": ["text/plain", "application/json"],
+        "outputModes": ["text/plain", "application/json"],
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "origin": {
+              "type": "string",
+              "description": "The departure airport code or city name (e.g., 'LHR', 'London')"
+            },
+            "destination": {
+              "type": "string",
+              "description": "The arrival airport code or city name (e.g., 'CDG', 'Paris')"
+            },
+            "time": {
+              "type": "string",
+              "description": "The desired departure time in ISO 8601 format or human-readable format (e.g., '2024-03-15T10:00:00Z', '10:00 AM')"
+            },
+            "fare": {
+              "type": "string",
+              "description": "The fare class for the booking (e.g., 'economy', 'premium_economy', 'business', 'first')",
+              "enum": ["economy", "premium_economy", "business", "first"]
+            }
+          },
+          "required": ["origin", "destination", "time", "fare"]
+        }
+      }
+    ]
+  }]]>
+      </a2a:json>
+    </a2a:agent-card>
+    <a2a:history taskRepositoryObjectStore="Default_ObjectStore"></a2a:history>
+  </a2a:server-config>
+  <ms-bedrock:config name="Bedrock-Config">
+    <ms-bedrock:basic-connection accessKey="${aws.access_key_id}" region="${aws.region}" secretKey="${aws.secret_access_key}"></ms-bedrock:basic-connection>
+  </ms-bedrock:config>
+  <flow doc:id="fba1" name="flightBookingAgentFlow">
+    <a2a:task-listener config-ref="A2A-Server-Listener" doc:id="zlidba" doc:name="A2A Server - Task Listener"></a2a:task-listener>
+    <logger doc:id="arquql" doc:name="Agent Request Received" level="INFO" message="Flight Booking Agent - Received request: #[payload]"></logger>
+    <ms-bedrock:chat-answer-prompt config-ref="Bedrock-Config" doc:id="spkfur" doc:name="Chat answer prompt" modelName="${bedrock.model.id}" prompt="#[&quot;You are a flight booking agent. You are polite and precise and only respond to flight booking agent. Your task is to determine whether the customer query is related to booking a flight. You must respond with a JSON string, no formatting, no backticks, pure JSON. Here is the instructions: \nIf the intent is not booking a flight then you must respond with the following json: {\&quot;intent\&quot; : \&quot;UNKNOWN\&quot;} \nIf the request is about booking a flight then you must determine whether the user is providing an origin and destination airport, the flight time(s) and fare. If all details are provided then you must respond with the following JSON: \n {\&quot;intent\&quot; : \&quot;booking\&quot;, \&quot;departure\&quot; : &lt;the departure airport including city and airport name&gt;, \&quot;destination\&quot; : &lt;the destination airport including city and airport name&gt;, \&quot;outbound_departure_time\&quot; : &lt;the chosen outbound time of departure&gt;, \&quot;inbound_departure_time\&quot; : &lt;the chosen inbound departure time. This will only be included if the flight is roundtrip&gt;, \&quot;is_roundtrip\&quot; : &lt;true if the flight is a roundtrip flight, false if it's one way only&gt;, \&quot;fare\&quot; : &lt;the fare chose by the customer&gt;}. \nIf the intent is 'booking' but any of departure, destination, departure times and fare are missing respond with the following JSON: \n&quot; ++          &quot;{\&quot;intent\&quot; : \&quot;booking\&quot;, \&quot;error\&quot; : true, \&quot;error-description\&quot; : &lt;the list of attributes that are missing&gt;} \n&quot; ++          &quot;The user prompt will be available after this simbol ~-~- :\n &quot; ++         &quot;~-~-\n&quot; ++ (payload.message.parts[0].text default &quot;&quot;) ++ &quot;~-~- \n&quot;]"></ms-bedrock:chat-answer-prompt>
+    <logger doc:id="kgnjnx" doc:name="Logger" message="Bedrock Payload: #[payload]"></logger>
+    <ee:transform doc:id="lbmoel" doc:name="Extract Bedrock response">
+      <ee:message>
+        <ee:set-payload doc:id="dvunex" doc:name="Set payload">
+          <![CDATA[%dw 2.0
+    output application/java
+    ---
+    read(payload."output".message.content[0].text as String default "", "application/json")]]>
+        </ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger doc:id="log1" doc:name="Agent Request Received" level="INFO" message="Intent Output: #[payload]"></logger>
+    <choice doc:id="jrmvnh" doc:name="Choice">
+      <when doc:name="Unknown Intent" expression="#[payload.intent == &quot;UNKNOWN&quot;]">
+        <ee:transform doc:id="aptxco" doc:name="Transform">
+          <ee:message>
+            <ee:set-payload doc:id="gfpdoy" doc:name="Set payload">
+              <![CDATA[output application/json
+var generatedId = uuid()
+---
+{
+    "id": uuid(),
+    "contextId": "context-" ++ generatedId,
+    "status": {
+      "state": "completed"
+    },
+    "artifacts": [
+      {
+        "name": "error",
+        "artifactId": "artifact-" ++ generatedId,
+        "parts": [
+          {
+            "kind": "text",
+            "text": "This agent only responds to flight booking prompts"
+          }
+        ]
+      }
+    ],
+    "kind": "task"
+  }]]>
+            </ee:set-payload>
+          </ee:message>
+        </ee:transform>
+      </when>
+      <when doc:name="Missing Details" expression="#[payload.intent == &quot;booking&quot; and (payload.error as Boolean default false)]">
+        <ee:transform doc:id="vlgwzz" doc:name="Transform">
+          <ee:message>
+            <ee:set-payload doc:id="yanjja" doc:name="Set payload">
+              <![CDATA[output application/json
+var generatedId = uuid()
+---
+{
+    "id": uuid(),
+    "contextId": "context-" ++ generatedId,
+    "status": {
+      "state": "completed"
+    },
+    "artifacts": [
+      {
+        "name": "error",
+        "artifactId": "artifact-" ++ generatedId,
+        "parts": [
+          {
+            "kind": "text",
+            "text": "One or more flight details are missing: " ++ (payload."error-description" as String default "")
+          }
+        ]
+      }
+    ],
+    "kind": "task"
+  }]]>
+            </ee:set-payload>
+          </ee:message>
+        </ee:transform>
+      </when>
+      <otherwise>
+        <ms-bedrock:chat-answer-prompt config-ref="Bedrock-Config" doc:id="qwceiw" doc:name="Chat answer prompt" modelName="${bedrock.model.id}" prompt='#["Generate a response that simulate a flight booking being confirmed that includes a fake flight confirmation number. Do not include any of your reasoning or blurb, just the generated content I need in Markdown format. These are the details: \n " ++ 
+"\nDeparture: " ++ (payload.departure as String default "") ++ 
+"\nDestination : " ++ (payload.destination as String default "") ++ 
+"\nOutbound Departure Time: " ++ (payload.outbound_departure_time as String default "") ++
+"\nInbound Departure Time: " ++ (payload.inbound_departure_time as String default "") ++ 
+"\nIs roundtrip? " ++ (payload.is_roundtrip as String default "" )]'></ms-bedrock:chat-answer-prompt>
+        <ee:transform doc:id="nitbre" doc:name="Transform">
+          <ee:message>
+            <ee:set-payload doc:id="gjyrip" doc:name="Set payload">
+              <![CDATA[output application/json
+var generatedId = uuid()
+---
+{
+    "id": uuid(),
+    "contextId": "context-" ++ generatedId,
+    "status": {
+      "state": "completed"
+    },
+    "artifacts": [
+      {
+        "name": "error",
+        "artifactId": "artifact-" ++ generatedId,
+        "parts": [
+          {
+            "kind": "text",
+            "text": payload."output".message.content[0].text
+          }
+        ]
+      }
+    ],
+    "kind": "task"
+  }]]>
+            </ee:set-payload>
+          </ee:message>
+        </ee:transform>
+      </otherwise>
+    </choice>
+    <!-- Input Validation -->
+    <!-- Determine Intent using Bedrock AI -->
+    <!-- Process Flight Booking -->
+    <!-- Format Agent Response -->
+    <logger doc:id="log2" doc:name="Agent Response Sent" level="INFO" message="Flight Booking Agent - Response sent: #[payload]"></logger>
+    <!-- Error Handling -->
+    <error-handler>
+      <on-error-propagate doc:name="On Error Propagate" enableNotifications="true" logException="true">
+        <ee:transform doc:name="Error Response">
+          <ee:message>
+            <ee:set-payload>
+              <![CDATA[%dw 2.0
+output application/json
+---
+{
+  agentId: p("a2a.agent.id"),
+  agentName: p("a2a.agent.name"),
+  skill: p("a2a.skill.name"),
+  response: {
+    success: false,
+    error: {
+      "type": error.errorType.identifier,
+      description: error.description,
+      timestamp: now(),
+      correlationId: correlationId
+    }
+  }
+}]]>
+            </ee:set-payload>
+          </ee:message>
+        </ee:transform>
+      </on-error-propagate>
+    </error-handler>
+  </flow>
+  <!-- Input Validation Sub-flow -->
+  <sub-flow doc:id="validate2" name="validateFlightRequest">
+    <choice doc:name="Validate Required Fields">
+      <when expression="#[payload.origin == null or payload.origin == '']">
+        <raise-error description="Origin airport is required" type="VALIDATION:INVALID_INPUT"></raise-error>
+      </when>
+      <when expression="#[payload.destination == null or payload.destination == '']">
+        <raise-error description="Destination airport is required" type="VALIDATION:INVALID_INPUT"></raise-error>
+      </when>
+      <when expression="#[payload.flightTime == null or payload.flightTime == '']">
+        <raise-error description="Flight time is required" type="VALIDATION:INVALID_INPUT"></raise-error>
+      </when>
+      <otherwise>
+        <logger doc:id="log_validate" doc:name="Validation Passed" level="INFO" message="Flight request validation passed for origin: #[payload.origin], destination: #[payload.destination]"></logger>
+      </otherwise>
+    </choice>
+  </sub-flow>
+  <!-- Intent Determination using Bedrock AI Sub-flow -->
+  <sub-flow doc:id="intent2" name="determineIntentWithBedrock">
+    <logger doc:id="log_intent_start" doc:name="Start Intent Analysis" level="INFO" message="Starting intent determination for flight booking request"></logger>
+    <!-- Prepare Bedrock AI Request -->
+    <ee:transform doc:id="transform_bedrock" doc:name="Prepare Bedrock Request">
+      <ee:message>
+        <ee:set-payload>
+          <![CDATA[%dw 2.0
+output application/json
+---
+{
+  "modelId": p("bedrock.model.id"),
+  "contentType": "application/json",
+  "accept": "application/json",
+  "body": {
+    "anthropic_version": "bedrock-2023-05-31",
+    "max_tokens": p("bedrock.max.tokens"),
+    "temperature": p("bedrock.temperature"),
+    "messages": [
+      {
+        "role": "user",
+        "content": "Analyze this flight booking request and confirm intent: Origin=" ++ (payload.origin default "") ++ ", Destination=" ++ (payload.destination default "") ++ ", Flight Time=" ++ (payload.flightTime default "") ++ ". Respond with JSON: {\"intent\":\"flight_booking\",\"confidence\":0.95,\"extracted_data\":{\"origin\":\"...\",\"destination\":\"...\",\"flightTime\":\"...\"}}"
+      }
+    ]
+  }
+}]]>
+        </ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <!-- Simulate Bedrock AI Call (Replace with actual Bedrock connector when available) -->
+    <ee:transform doc:id="transform_intent_response" doc:name="Simulate Intent Response">
+      <ee:message>
+        <ee:set-payload>
+          <![CDATA[%dw 2.0
+output application/json
+---
+{
+  "intent": "flight_booking",
+  "confidence": 0.98,
+  "extracted_data": {
+    "origin": payload.body.messages[0].content splitBy "Origin="[1] splitBy ","[0],
+    "destination": payload.body.messages[0].content splitBy "Destination="[1] splitBy ","[0], 
+    "flightTime": payload.body.messages[0].content splitBy "Flight Time="[1] splitBy "."[0]
+  }
+}]]>
+        </ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger doc:id="log_intent_result" doc:name="Intent Determined" level="INFO" message="Intent determined: #[payload.intent] with confidence: #[payload.confidence]"></logger>
+  </sub-flow>
+  <!-- Flight Booking Processing Sub-flow -->
+  <!-- Health Check Flow -->
+</mule>

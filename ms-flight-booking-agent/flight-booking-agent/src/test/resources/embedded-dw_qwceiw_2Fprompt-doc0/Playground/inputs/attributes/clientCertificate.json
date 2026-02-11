@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 12,
+  "criticalExtensionOIDs": [
+    "justo",
+    "vitae",
+    "faucibus"
+  ],
+  "extendedKeyUsage": [
+    "molestie",
+    "ipsum"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "Aliquam"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Albina",
+      "type": 98
+    }
+  ],
+  "issuerDN": {
+    "commonName": "Pellentesque",
+    "name": "Altagracia"
+  },
+  "issuerUniqueID": [
+    false,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Cyril"
+  },
+  "keyUsage": [
+    false,
+    true,
+    true
+  ],
+  "name": "Cory",
+  "nonCriticalExtensionOIDs": [
+    "libero",
+    "tempor"
+  ],
+  "publicKey": {
+    "algorithm": "a",
+    "modulus": 1,
+    "params": 17,
+    "publicKey": "a"
+  },
+  "serialNumber": 24,
+  "serialNumberObject": {
+    "serialNumber": 39
+  },
+  "sigAlgName": "risus",
+  "sigAlgOID": "vitae",
+  "subjectAlternativeNames": [
+    {
+      "name": "Bruno",
+      "type": 23
+    }
+  ],
+  "subjectDN": {
+    "commonName": "In",
+    "name": "Amelia"
+  },
+  "subjectX500Principal": {
+    "name": "Aleta"
+  },
+  "type": "tempor",
+  "version": 89
+}

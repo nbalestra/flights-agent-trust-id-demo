@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 92,
+  "criticalExtensionOIDs": [
+    "adipiscing",
+    "sed",
+    "sit"
+  ],
+  "extendedKeyUsage": [
+    "tempor",
+    "lectus"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "sodales"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Abel",
+      "type": 29
+    }
+  ],
+  "issuerDN": {
+    "commonName": "dolor",
+    "name": "Craig"
+  },
+  "issuerUniqueID": [
+    true,
+    false,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Allene"
+  },
+  "keyUsage": [
+    false,
+    false
+  ],
+  "name": "Aldo",
+  "nonCriticalExtensionOIDs": [
+    "tempor",
+    "a"
+  ],
+  "publicKey": {
+    "algorithm": "Pellentesque",
+    "modulus": 80,
+    "params": 92,
+    "publicKey": "molestie"
+  },
+  "serialNumber": 22,
+  "serialNumberObject": {
+    "serialNumber": 11
+  },
+  "sigAlgName": "nunc",
+  "sigAlgOID": "ut",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alica",
+      "type": 40
+    }
+  ],
+  "subjectDN": {
+    "commonName": "aliquam",
+    "name": "Bryan"
+  },
+  "subjectX500Principal": {
+    "name": "Adelle"
+  },
+  "type": "molestie",
+  "version": 20
+}

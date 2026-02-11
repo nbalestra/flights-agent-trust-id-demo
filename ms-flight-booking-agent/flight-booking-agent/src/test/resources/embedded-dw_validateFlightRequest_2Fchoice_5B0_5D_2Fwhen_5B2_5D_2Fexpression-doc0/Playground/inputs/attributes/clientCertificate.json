@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 7,
+  "criticalExtensionOIDs": [
+    "Lorem",
+    "a",
+    "felis"
+  ],
+  "extendedKeyUsage": [
+    "vitae",
+    "sit"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "dolor"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Alvina",
+      "type": 44
+    }
+  ],
+  "issuerDN": {
+    "commonName": "venenatis",
+    "name": "Carmelo"
+  },
+  "issuerUniqueID": [
+    true,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Alvina"
+  },
+  "keyUsage": [
+    true,
+    true,
+    true
+  ],
+  "name": "Alexander",
+  "nonCriticalExtensionOIDs": [
+    "Nam",
+    "mi"
+  ],
+  "publicKey": {
+    "algorithm": "sodales",
+    "modulus": 26,
+    "params": 93,
+    "publicKey": "lectus"
+  },
+  "serialNumber": 69,
+  "serialNumberObject": {
+    "serialNumber": 67
+  },
+  "sigAlgName": "at",
+  "sigAlgOID": "consectetur",
+  "subjectAlternativeNames": [
+    {
+      "name": "Abraham",
+      "type": 32
+    }
+  ],
+  "subjectDN": {
+    "commonName": "ut",
+    "name": "Christian"
+  },
+  "subjectX500Principal": {
+    "name": "Damian"
+  },
+  "type": "eget",
+  "version": 59
+}

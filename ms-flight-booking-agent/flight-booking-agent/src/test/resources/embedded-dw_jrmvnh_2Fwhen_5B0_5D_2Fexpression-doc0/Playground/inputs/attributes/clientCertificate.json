@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 24,
+  "criticalExtensionOIDs": [
+    "erat",
+    "aliquam",
+    "nisi"
+  ],
+  "extendedKeyUsage": [
+    "Lorem",
+    "risus",
+    "sed"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "lorem"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "America",
+      "type": 14
+    }
+  ],
+  "issuerDN": {
+    "commonName": "ipsum",
+    "name": "Albertha"
+  },
+  "issuerUniqueID": [
+    false,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Alva"
+  },
+  "keyUsage": [
+    true,
+    false
+  ],
+  "name": "Agripina",
+  "nonCriticalExtensionOIDs": [
+    "sodales",
+    "elit"
+  ],
+  "publicKey": {
+    "algorithm": "a",
+    "modulus": 94,
+    "params": 55,
+    "publicKey": "libero"
+  },
+  "serialNumber": 86,
+  "serialNumberObject": {
+    "serialNumber": 63
+  },
+  "sigAlgName": "aliquam",
+  "sigAlgOID": "tempor",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alva",
+      "type": 58
+    }
+  ],
+  "subjectDN": {
+    "commonName": "semper",
+    "name": "Cole"
+  },
+  "subjectX500Principal": {
+    "name": "Claudio"
+  },
+  "type": "nunc",
+  "version": 71
+}

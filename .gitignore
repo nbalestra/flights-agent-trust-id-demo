@@ -58,3 +58,4 @@ index.html
 app.js
 keycloak-config.js
 silent-check-sso.html
+ms-flight-booking-agent/flight-booking-agent/src/main/resources/config.properties

@@ -1,0 +1,73 @@
+{
+  "basicConstraints": 57,
+  "criticalExtensionOIDs": [
+    "lorem",
+    "Nam",
+    "ipsum"
+  ],
+  "extendedKeyUsage": [
+    "sit",
+    "Lorem",
+    "tempor"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "convallis"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Ahmed",
+      "type": 26
+    }
+  ],
+  "issuerDN": {
+    "commonName": "arcu",
+    "name": "Cletus"
+  },
+  "issuerUniqueID": [
+    true,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Adrian"
+  },
+  "keyUsage": [
+    true,
+    false,
+    false
+  ],
+  "name": "Ali",
+  "nonCriticalExtensionOIDs": [
+    "a",
+    "adipiscing"
+  ],
+  "publicKey": {
+    "algorithm": "Nunc",
+    "modulus": 31,
+    "params": 65,
+    "publicKey": "nunc"
+  },
+  "serialNumber": 70,
+  "serialNumberObject": {
+    "serialNumber": 83
+  },
+  "sigAlgName": "Nunc",
+  "sigAlgOID": "nibh",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alayna",
+      "type": 88
+    }
+  ],
+  "subjectDN": {
+    "commonName": "tempor",
+    "name": "Adaline"
+  },
+  "subjectX500Principal": {
+    "name": "Buddy"
+  },
+  "type": "tempor",
+  "version": 15
+}

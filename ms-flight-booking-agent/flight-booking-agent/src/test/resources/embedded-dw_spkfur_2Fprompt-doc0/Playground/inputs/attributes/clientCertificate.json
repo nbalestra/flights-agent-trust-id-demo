@@ -1,0 +1,73 @@
+{
+  "basicConstraints": 5,
+  "criticalExtensionOIDs": [
+    "elit",
+    "arcu",
+    "Pellentesque"
+  ],
+  "extendedKeyUsage": [
+    "dolor",
+    "eros",
+    "ac"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "erat"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Alberto",
+      "type": 75
+    }
+  ],
+  "issuerDN": {
+    "commonName": "dolor",
+    "name": "Alysia"
+  },
+  "issuerUniqueID": [
+    false,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Adrian"
+  },
+  "keyUsage": [
+    true,
+    true,
+    true
+  ],
+  "name": "Aisha",
+  "nonCriticalExtensionOIDs": [
+    "a",
+    "nunc"
+  ],
+  "publicKey": {
+    "algorithm": "tempor",
+    "modulus": 96,
+    "params": 33,
+    "publicKey": "tempor"
+  },
+  "serialNumber": 63,
+  "serialNumberObject": {
+    "serialNumber": 11
+  },
+  "sigAlgName": "nibh",
+  "sigAlgOID": "erat",
+  "subjectAlternativeNames": [
+    {
+      "name": "Coleman",
+      "type": 96
+    }
+  ],
+  "subjectDN": {
+    "commonName": "sodales",
+    "name": "Alina"
+  },
+  "subjectX500Principal": {
+    "name": "Carlton"
+  },
+  "type": "consectetur",
+  "version": 39
+}

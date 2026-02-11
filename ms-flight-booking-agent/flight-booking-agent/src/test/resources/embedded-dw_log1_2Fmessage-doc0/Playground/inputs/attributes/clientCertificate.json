@@ -1,0 +1,74 @@
+{
+  "basicConstraints": 23,
+  "criticalExtensionOIDs": [
+    "Nam",
+    "dui",
+    "dolor"
+  ],
+  "extendedKeyUsage": [
+    "viverra",
+    "Nam",
+    "justo"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "tempor"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Ana",
+      "type": 34
+    }
+  ],
+  "issuerDN": {
+    "commonName": "ac",
+    "name": "Alonso"
+  },
+  "issuerUniqueID": [
+    false,
+    false,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Damien"
+  },
+  "keyUsage": [
+    true,
+    true,
+    true
+  ],
+  "name": "Alejandra",
+  "nonCriticalExtensionOIDs": [
+    "convallis",
+    "pulvinar"
+  ],
+  "publicKey": {
+    "algorithm": "nunc",
+    "modulus": 62,
+    "params": 88,
+    "publicKey": "erat"
+  },
+  "serialNumber": 53,
+  "serialNumberObject": {
+    "serialNumber": 97
+  },
+  "sigAlgName": "Fusce",
+  "sigAlgOID": "risus",
+  "subjectAlternativeNames": [
+    {
+      "name": "Connie",
+      "type": 11
+    }
+  ],
+  "subjectDN": {
+    "commonName": "erat",
+    "name": "Alfredo"
+  },
+  "subjectX500Principal": {
+    "name": "Cecil"
+  },
+  "type": "mi",
+  "version": 15
+}

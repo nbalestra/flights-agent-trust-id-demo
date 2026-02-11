@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 75,
+  "criticalExtensionOIDs": [
+    "eros",
+    "pulvinar"
+  ],
+  "extendedKeyUsage": [
+    "nunc",
+    "Nam",
+    "molestie"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "ipsum"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Chang",
+      "type": 1
+    }
+  ],
+  "issuerDN": {
+    "commonName": "semper",
+    "name": "Abbie"
+  },
+  "issuerUniqueID": [
+    false,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Burl"
+  },
+  "keyUsage": [
+    false,
+    true,
+    true
+  ],
+  "name": "Clement",
+  "nonCriticalExtensionOIDs": [
+    "dictum",
+    "a"
+  ],
+  "publicKey": {
+    "algorithm": "ipsum",
+    "modulus": 52,
+    "params": 25,
+    "publicKey": "mi"
+  },
+  "serialNumber": 40,
+  "serialNumberObject": {
+    "serialNumber": 22
+  },
+  "sigAlgName": "dolor",
+  "sigAlgOID": "mi",
+  "subjectAlternativeNames": [
+    {
+      "name": "Carmine",
+      "type": 45
+    }
+  ],
+  "subjectDN": {
+    "commonName": "sed",
+    "name": "Alonso"
+  },
+  "subjectX500Principal": {
+    "name": "Adrian"
+  },
+  "type": "tempor",
+  "version": 62
+}

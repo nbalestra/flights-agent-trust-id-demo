@@ -1,0 +1,73 @@
+{
+  "basicConstraints": 56,
+  "criticalExtensionOIDs": [
+    "a",
+    "nunc",
+    "Fusce"
+  ],
+  "extendedKeyUsage": [
+    "elit",
+    "mi"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "erat"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Adan",
+      "type": 14
+    }
+  ],
+  "issuerDN": {
+    "commonName": "faucibus",
+    "name": "Agustina"
+  },
+  "issuerUniqueID": [
+    false,
+    true,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Alena"
+  },
+  "keyUsage": [
+    true,
+    true,
+    true
+  ],
+  "name": "Carl",
+  "nonCriticalExtensionOIDs": [
+    "nunc",
+    "dui"
+  ],
+  "publicKey": {
+    "algorithm": "adipiscing",
+    "modulus": 50,
+    "params": 2,
+    "publicKey": "Aliquam"
+  },
+  "serialNumber": 9,
+  "serialNumberObject": {
+    "serialNumber": 22
+  },
+  "sigAlgName": "erat",
+  "sigAlgOID": "arcu",
+  "subjectAlternativeNames": [
+    {
+      "name": "Aliza",
+      "type": 36
+    }
+  ],
+  "subjectDN": {
+    "commonName": "dui",
+    "name": "Alfredo"
+  },
+  "subjectX500Principal": {
+    "name": "Alita"
+  },
+  "type": "arcu",
+  "version": 34
+}

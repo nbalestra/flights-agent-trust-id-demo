@@ -1,0 +1,71 @@
+{
+  "basicConstraints": 6,
+  "criticalExtensionOIDs": [
+    "consectetur",
+    "adipiscing"
+  ],
+  "extendedKeyUsage": [
+    "erat",
+    "ut"
+  ],
+  "extensions": [
+    {
+      "criticality": true,
+      "oid": "tempor"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Adriane",
+      "type": 20
+    }
+  ],
+  "issuerDN": {
+    "commonName": "tempor",
+    "name": "Alysia"
+  },
+  "issuerUniqueID": [
+    false,
+    false,
+    false
+  ],
+  "issuerX500Principal": {
+    "name": "Adaline"
+  },
+  "keyUsage": [
+    true,
+    false
+  ],
+  "name": "Bryan",
+  "nonCriticalExtensionOIDs": [
+    "eget",
+    "felis"
+  ],
+  "publicKey": {
+    "algorithm": "ut",
+    "modulus": 67,
+    "params": 96,
+    "publicKey": "aliquam"
+  },
+  "serialNumber": 35,
+  "serialNumberObject": {
+    "serialNumber": 63
+  },
+  "sigAlgName": "nunc",
+  "sigAlgOID": "lorem",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alexander",
+      "type": 10
+    }
+  ],
+  "subjectDN": {
+    "commonName": "tincidunt",
+    "name": "Alfredo"
+  },
+  "subjectX500Principal": {
+    "name": "Chi"
+  },
+  "type": "consectetur",
+  "version": 25
+}

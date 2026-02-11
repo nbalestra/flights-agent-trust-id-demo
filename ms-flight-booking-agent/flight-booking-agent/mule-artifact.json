@@ -1,0 +1,7 @@
+{
+  "name": "flight-booking-agent",
+  "minMuleVersion": "4.11.0",
+  "javaSpecificationVersions": [
+    "17"
+  ]
+}

@@ -5,7 +5,7 @@ export default function Loading() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-easyjet-orange to-easyjet-orange-dark">
       <div className="text-center space-y-4">
         <Loader2 className="w-12 h-12 text-white animate-spin mx-auto" />
-        <p className="text-white text-lg">Loading EasyJetlag...</p>
+        <p className="text-white text-lg">Loading Jetlag Airlines...</p>
       </div>
     </div>
   );

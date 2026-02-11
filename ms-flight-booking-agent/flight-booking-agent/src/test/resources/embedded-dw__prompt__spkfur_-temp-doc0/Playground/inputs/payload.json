@@ -1,0 +1,50 @@
+{
+  "configuration": {
+    "blocking": false,
+    "acceptedOutputModes": [
+      "eget",
+      "convallis"
+    ],
+    "historyLength": 73,
+    "pushNotificationConfig": {
+      "id": "semper",
+      "url": "http://convallis.com/3",
+      "token": "consectetur",
+      "authentication": {
+        "credentials": "arcu",
+        "schemes": [
+          "aliquam",
+          "sodales"
+        ]
+      }
+    }
+  },
+  "message": {
+    "extensions": [
+      "faucibus",
+      "molestie",
+      "nunc"
+    ],
+    "role": "Aliquam",
+    "referenceTaskIds": [
+      "erat",
+      "consectetur",
+      "a"
+    ],
+    "parts": [
+      {
+        "file": {
+          "bytes": "tempor",
+          "name": "Alexis",
+          "mimeType": "pulvinar",
+          "uri": "tempor"
+        },
+        "kind": "felis",
+        "text": "tempor"
+      }
+    ],
+    "messageId": "libero",
+    "contextId": "consectetur",
+    "taskId": "ut"
+  }
+}

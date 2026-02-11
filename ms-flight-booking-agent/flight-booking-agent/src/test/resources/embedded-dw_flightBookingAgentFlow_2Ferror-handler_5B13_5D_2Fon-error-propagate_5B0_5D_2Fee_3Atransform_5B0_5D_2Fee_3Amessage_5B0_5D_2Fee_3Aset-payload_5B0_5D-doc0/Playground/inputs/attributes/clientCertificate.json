@@ -1,0 +1,73 @@
+{
+  "basicConstraints": 85,
+  "criticalExtensionOIDs": [
+    "molestie",
+    "sodales"
+  ],
+  "extendedKeyUsage": [
+    "elit",
+    "ipsum"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "sed"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Cornell",
+      "type": 23
+    }
+  ],
+  "issuerDN": {
+    "commonName": "dui",
+    "name": "Adria"
+  },
+  "issuerUniqueID": [
+    true,
+    true,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Al"
+  },
+  "keyUsage": [
+    false,
+    false,
+    true
+  ],
+  "name": "Albina",
+  "nonCriticalExtensionOIDs": [
+    "nunc",
+    "faucibus",
+    "Nunc"
+  ],
+  "publicKey": {
+    "algorithm": "risus",
+    "modulus": 22,
+    "params": 5,
+    "publicKey": "nisi"
+  },
+  "serialNumber": 78,
+  "serialNumberObject": {
+    "serialNumber": 21
+  },
+  "sigAlgName": "felis",
+  "sigAlgOID": "a",
+  "subjectAlternativeNames": [
+    {
+      "name": "Adeline",
+      "type": 32
+    }
+  ],
+  "subjectDN": {
+    "commonName": "semper",
+    "name": "Alethea"
+  },
+  "subjectX500Principal": {
+    "name": "Alesha"
+  },
+  "type": "sed",
+  "version": 94
+}
