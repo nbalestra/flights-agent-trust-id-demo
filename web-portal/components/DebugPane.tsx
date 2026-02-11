@@ -26,11 +26,10 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   return (
     <button
       onClick={handleCopy}
-      className={`inline-flex items-center space-x-1 px-2 py-1 text-xs rounded transition-colors ${
-        copied
+      className={`inline-flex items-center space-x-1 px-2 py-1 text-xs rounded transition-colors ${copied
           ? 'bg-green-100 text-green-700'
           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-      }`}
+        }`}
       title={`Copy ${label}`}
     >
       {copied ? (
@@ -232,9 +231,8 @@ export function DebugPane() {
           logs.map((log) => (
             <div
               key={log.id}
-              className={`border rounded-lg overflow-hidden ${
-                log.id === latestLog?.id ? 'ring-2 ring-easyjet-orange' : 'border-gray-200'
-              }`}
+              className={`border rounded-lg overflow-hidden ${log.id === latestLog?.id ? 'ring-2 ring-easyjet-orange' : 'border-gray-200'
+                }`}
             >
               {/* Log Header */}
               <button
@@ -248,7 +246,7 @@ export function DebugPane() {
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   )}
                 </div>
-                
+
                 <div className={`flex-shrink-0 mr-3 p-2 rounded ${getTypeColor(log.type)}`}>
                   {getIcon(log.type)}
                 </div>
@@ -388,7 +386,7 @@ export function DebugPane() {
                                   <div><span className="font-semibold">Scopes:</span> {log.details.accessToken.scopes}</div>
                                 )}
                               </div>
-                              
+
                               {/* Full Decoded Token (collapsible) */}
                               <details className="cursor-pointer">
                                 <summary className="text-xs font-semibold text-blue-600 hover:text-blue-800">
@@ -489,6 +487,64 @@ export function DebugPane() {
                         </details>
                       </div>
                     )}
+
+                    {/* Exchange Token Raw */}
+                    {(() => {
+                      const task = log.details.a2aResponse?.result?.task || log.details.a2aResponse?.result;
+                      const exchangeTokenRaw = task?.metadata?.exchange_token;
+                      if (!exchangeTokenRaw) return null;
+                      return (
+                        <div>
+                          <details className="cursor-pointer">
+                            <summary className="font-semibold text-cyan-700 hover:text-cyan-900">
+                              🔑 Exchange Token Raw
+                            </summary>
+                            <div className="mt-2">
+                              <div className="flex justify-end mb-1">
+                                <CopyButton
+                                  text={exchangeTokenRaw}
+                                  label="Exchange Token Raw"
+                                />
+                              </div>
+                              <pre className="p-2 bg-cyan-50 rounded border border-cyan-200 text-xs overflow-x-auto max-h-64 overflow-y-auto break-all">
+                                {exchangeTokenRaw}
+                              </pre>
+                            </div>
+                          </details>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Exchange Token Decoded */}
+                    {(() => {
+                      const task = log.details.a2aResponse?.result?.task || log.details.a2aResponse?.result;
+                      const exchangeTokenDecoded = task?.metadata?.exchange_token_decoded;
+                      if (!exchangeTokenDecoded) return null;
+                      return (
+                        <div>
+                          <details className="cursor-pointer">
+                            <summary className="font-semibold text-teal-700 hover:text-teal-900">
+                              🔓 Exchange Token Decoded
+                            </summary>
+                            <div className="mt-2">
+                              <div className="flex justify-end mb-1">
+                                <CopyButton
+                                  text={typeof exchangeTokenDecoded === 'object'
+                                    ? JSON.stringify(exchangeTokenDecoded, null, 2)
+                                    : String(exchangeTokenDecoded)}
+                                  label="Exchange Token Decoded"
+                                />
+                              </div>
+                              <pre className="p-2 bg-teal-50 rounded border border-teal-200 text-xs overflow-x-auto max-h-64 overflow-y-auto">
+                                {typeof exchangeTokenDecoded === 'object'
+                                  ? JSON.stringify(exchangeTokenDecoded, null, 2)
+                                  : String(exchangeTokenDecoded)}
+                              </pre>
+                            </div>
+                          </details>
+                        </div>
+                      );
+                    })()}
 
                     {/* Other Details */}
                     {Object.entries(log.details).map(([key, value]) => {
