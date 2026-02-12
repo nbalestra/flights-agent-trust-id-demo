@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-This repository follows a **monorepo structure** to organize all EasyJetlag components in a single repository.
+This repository follows a **monorepo structure** to organize all Jetlag Airlines components in a single repository.
 
 ```
 flights-agent-trust-id-demo/

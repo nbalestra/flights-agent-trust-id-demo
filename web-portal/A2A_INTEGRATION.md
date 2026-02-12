@@ -1,6 +1,6 @@
 # A2A Agent Integration Guide
 
-This document provides detailed information about integrating your A2A (Agent-to-Agent) compliant agent with the EasyJetlag application.
+This document provides detailed information about integrating your A2A (Agent-to-Agent) compliant agent with the Jetlag Airlines application.
 
 ## Overview
 
@@ -63,7 +63,7 @@ Your A2A agent should respond with:
   },
   metadata: {
     conversationId: "conv-123456",
-    agentId: "easyjetlag-agent-01",
+    agentId: "jetlag-airlines-agent-01",
     confidence: 0.95
   }
 }
@@ -160,7 +160,7 @@ Your agent can:
 A2A_AGENT_URL=https://your-agent.example.com/api/chat
 
 # Your agent's identifier (optional)
-A2A_AGENT_ID=easyjetlag-agent-production
+A2A_AGENT_ID=jetlag-airlines-agent-production
 ```
 
 ### Agent Authentication (Optional)
@@ -454,7 +454,7 @@ def chat():
         },
         'metadata': {
             'conversationId': conv_id,
-            'agentId': 'easyjetlag-agent'
+            'agentId': 'jetlag-airlines-agent'
         }
     })
 
@@ -504,7 +504,7 @@ app.post('/api/chat', async (req, res) => {
     },
     metadata: {
       conversationId,
-      agentId: 'easyjetlag-agent'
+      agentId: 'jetlag-airlines-agent'
     }
   });
 });

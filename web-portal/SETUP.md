@@ -1,6 +1,6 @@
-# EasyJetlag Setup Guide
+# Jetlag Airlines Setup Guide
 
-This guide will walk you through setting up the EasyJetlag application from scratch.
+This guide will walk you through setting up the Jetlag Airlines application from scratch.
 
 > **Important:** This application uses a **public** Keycloak client. No client secret is required! See [KEYCLOAK_PUBLIC_CLIENT.md](./KEYCLOAK_PUBLIC_CLIENT.md) for detailed information.
 
@@ -57,7 +57,7 @@ Visit [http://localhost:3000](http://localhost:3000)
 3. **Create a New Client**
    - Go to: Clients → Create
    - Fill in:
-     - **Client ID**: `easyjetlag-app` (or your preferred name)
+     - **Client ID**: `jetlag-app` (or your preferred name)
      - **Client Protocol**: `openid-connect`
    - Click Save
 
@@ -102,7 +102,7 @@ NEXTAUTH_SECRET=<paste-the-generated-secret-here>
 
 # Keycloak Configuration (Public Client)
 KEYCLOAK_ISSUER=https://lemur-8.cloud-iam.com/auth/realms/maf
-KEYCLOAK_CLIENT_ID=easyjetlag-app
+KEYCLOAK_CLIENT_ID=jetlag-app
 # No client secret needed for public clients
 
 # A2A Agent (Leave empty for now - will use mock responses)
@@ -133,7 +133,7 @@ npm run lint
 
 1. **Access the App**
    - Open [http://localhost:3000](http://localhost:3000)
-   - You should see the EasyJetlag login page
+   - You should see the Jetlag login page
 
 2. **Test Login**
    - Click "Sign In with Keycloak"
@@ -182,7 +182,7 @@ git commit -m "Initial commit"
 heroku login
 
 # Create app
-heroku create easyjetlag-app
+heroku create jetlag-app
 # Note: Use a unique name or let Heroku generate one
 ```
 
@@ -190,10 +190,10 @@ heroku create easyjetlag-app
 
 ```bash
 # Set all environment variables
-heroku config:set NEXTAUTH_URL=https://easyjetlag-app.herokuapp.com
+heroku config:set NEXTAUTH_URL=https://jetlag-app.herokuapp.com
 heroku config:set NEXTAUTH_SECRET=$(openssl rand -base64 32)
 heroku config:set KEYCLOAK_ISSUER=https://lemur-8.cloud-iam.com/auth/realms/maf
-heroku config:set KEYCLOAK_CLIENT_ID=easyjetlag-app
+heroku config:set KEYCLOAK_CLIENT_ID=jetlag-app
 # No KEYCLOAK_CLIENT_SECRET needed for public clients
 heroku config:set NODE_ENV=production
 
@@ -209,16 +209,16 @@ In Keycloak admin console:
 2. Verify **Access Type** is set to `public`
 3. Add production URLs to **Valid Redirect URIs**:
    ```
-   https://easyjetlag-app.herokuapp.com/*
-   https://easyjetlag-app.herokuapp.com/api/auth/callback/keycloak
+   https://jetlag-app.herokuapp.com/*
+   https://jetlag-app.herokuapp.com/api/auth/callback/keycloak
    ```
 4. Add to **Web Origins**:
    ```
-   https://easyjetlag-app.herokuapp.com
+   https://jetlag-app.herokuapp.com
    ```
 5. Update **Base URL**:
    ```
-   https://easyjetlag-app.herokuapp.com
+   https://jetlag-app.herokuapp.com
    ```
 6. Click Save
 
@@ -373,7 +373,7 @@ curl -X POST http://localhost:3000/api/chat \
 node --version  # Should be 18+
 
 # Clear build cache
-heroku repo:purge_cache -a easyjetlag-app
+heroku repo:purge_cache -a jetlag-app
 git commit --allow-empty -m "Rebuild"
 git push heroku main
 

@@ -85,7 +85,7 @@ This shows the complete session object. Look for:
 #### Solution 1: Check Keycloak Client Configuration
 
 In Keycloak Admin Console:
-1. Go to your client (e.g., `easyjetlag-app`)
+1. Go to your client (e.g., `jetlag-app`)
 2. Settings tab:
    - ✅ Standard Flow Enabled: ON
    - ✅ Direct Access Grants Enabled: ON

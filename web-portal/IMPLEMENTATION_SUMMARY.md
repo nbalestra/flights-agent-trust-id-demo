@@ -212,7 +212,7 @@ A2A_SEARCH_AGENT_URL=<your-search-agent-endpoint>
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=<set>
 KEYCLOAK_ISSUER=https://lemur-8.cloud-iam.com/auth/realms/maf
-KEYCLOAK_CLIENT_ID=easyjetlag-app
+KEYCLOAK_CLIENT_ID=jetlag-app
 ```
 
 ## 📝 Next Actions

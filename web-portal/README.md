@@ -1,6 +1,6 @@
-# EasyJetlag - AI Travel Assistant
+# Jetlag Airlines - AI Travel Assistant
 
-A modern Next.js application for EasyJetlag airline with Keycloak authentication and A2A agent integration.
+A modern Next.js application for Jetlag Airlines with Keycloak authentication and A2A agent integration.
 
 ## Features
 
@@ -73,7 +73,7 @@ openssl rand -base64 32
 1. Log into your Keycloak admin console
 2. Select the `maf` realm (or your realm)
 3. Create a new client:
-   - **Client ID**: Choose a unique ID (e.g., `easyjetlag-app`)
+   - **Client ID**: Choose a unique ID (e.g., `jetlag-app`)
    - **Client Protocol**: openid-connect
    - **Access Type**: public (no client secret required)
    - **Valid Redirect URIs**: 
@@ -184,7 +184,7 @@ heroku login
 ### 3. Create Heroku App
 
 ```bash
-heroku create easyjetlag-app
+heroku create jetlag-app
 # or use: heroku create (for auto-generated name)
 ```
 
@@ -315,7 +315,7 @@ npm run type-check   # Run TypeScript compiler check
 
 ## License
 
-Private and Confidential - EasyJetlag Airlines
+Private and Confidential - Jetlag Airlines
 
 ## Support
 
@@ -326,4 +326,4 @@ For issues and questions:
 
 ---
 
-Built with ❤️ for EasyJetlag Airlines
+Built with ❤️ for Jetlag Airlines

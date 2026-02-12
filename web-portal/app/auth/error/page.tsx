@@ -19,7 +19,7 @@ export default function AuthError() {
           title: 'Access Denied',
           message: 'You do not have permission to access this application.',
           details: 'Your access token does not include Jetlag Airlines in its audience.',
-          requiredAudience: 'easyjetlag-app',
+          requiredAudience: 'jetlag-app',
         };
       case 'Configuration':
         return {
@@ -84,7 +84,7 @@ export default function AuthError() {
           {isAccessDenied && (
             <div className="bg-blue-50 rounded-lg p-4 text-left">
               <p className="text-sm text-blue-700">
-                Please contact your administrator to request access to the EasyJetlag application.
+                Please contact your administrator to request access to the Jetlag Airlines application.
               </p>
             </div>
           )}

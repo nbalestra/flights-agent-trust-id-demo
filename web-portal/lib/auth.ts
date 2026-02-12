@@ -24,7 +24,7 @@ function decodeJWTPayload(token: string | undefined): Record<string, unknown> | 
 }
 
 // Authorization constants
-const REQUIRED_AUDIENCE = 'easyjetlag-app';
+const REQUIRED_AUDIENCE = 'jetlag-app';
 
 // Check if the access token audience contains the required client
 function hasRequiredAudience(accessToken: string | undefined): boolean {
@@ -140,8 +140,8 @@ export const authOptions: NextAuthOptions = {
         const expiresAt = account.expires_at
           ? account.expires_at * 1000
           : tokenExp
-          ? tokenExp
-          : Date.now() + 300 * 1000;
+            ? tokenExp
+            : Date.now() + 300 * 1000;
 
         console.log('[NextAuth JWT] Initial sign-in, account received:', {
           hasAccessToken: !!account.access_token,

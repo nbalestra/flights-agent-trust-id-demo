@@ -1,8 +1,8 @@
-# 🛫 EasyJetlag - Project Overview
+# 🛫 Jetlag Airlines - Project Overview
 
 ## What Has Been Created
 
-A production-ready Next.js application for EasyJetlag airline with:
+A production-ready Next.js application for Jetlag Airlines with:
 - ✅ Keycloak authentication (OIDC)
 - ✅ A2A agent integration (ready for your agent)
 - ✅ Modern chat interface

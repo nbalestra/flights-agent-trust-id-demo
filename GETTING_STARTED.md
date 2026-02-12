@@ -1,4 +1,4 @@
-# Getting Started - EasyJetlag Project
+# Getting Started - Jetlag Airline Project
 
 ## 🎯 Quick Start
 

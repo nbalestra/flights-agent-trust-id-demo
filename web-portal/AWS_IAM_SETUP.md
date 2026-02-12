@@ -54,7 +54,7 @@ Create a dedicated IAM user for the application:
 
 1. Go to **AWS Console → IAM → Users**
 2. Click **Add User**
-3. User name: `easyjetlag-app-bedrock`
+3. User name: `jetlag-app-bedrock`
 4. Select **Access key - Programmatic access**
 5. Click **Next: Permissions**
 6. Choose **Attach existing policies directly**
